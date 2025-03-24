@@ -177,10 +177,15 @@ def text_from_cli_arg_or_fs_or_editor(body_or_path: str) -> str:
 
 
 @cli.command(name="show")
-@click.option("--format", type=click.Choice(("plain", "json")), default="plain")
+@click.option(
+    "--format",
+    type=click.Choice(("plain", "json")),
+    default="plain",
+    help="Output format",
+)
 @click.argument("task-id", type=Task.from_str)
 def show_task(task_id: int, format: str = "plain"):
-    """Show information about a Maniphest task"""
+    """Show information about a Phabricator task"""
     client = PhabricatorClient()
     if task := client.show_task(task_id):
         author = client.show_user(phid=task["fields"]["authorPHID"])
@@ -238,16 +243,19 @@ def show_task(task_id: int, format: str = "plain"):
 
 @cli.command(name="create")
 @click.option("--title", required=True, help="Title of the task")
-@click.option("--description", help="Description of the task")
+@click.option(
+    "--description",
+    help="Task description or path to a file containing the description body. If not provided, an editor will be opened.",
+)
 @click.option(
     "--priority",
     type=click.Choice(["unbreaknow", "high", "normal", "low", "needs-triage"]),
     help="Priority level of the task",
     default="normal",
 )
-@click.option("--project-tags", multiple=True, help="Project tags for the task")
+# @click.option("--project-tags", multiple=True, help="Project tags for the task")
 @click.option("--parent-id", type=int, help="ID of parent task")
-@click.option("--cc", multiple=True, help="Users to CC on the task")
+# @click.option("--cc", multiple=True, help="Users to CC on the task")
 @click.pass_context
 def create_task(
     ctx,
@@ -276,10 +284,15 @@ def create_task(
 
 
 @cli.command(name="assign")
-@click.option("--username", required=False)
+@click.option(
+    "--username",
+    required=False,
+    help="The username to assign the task to. Self-assign the task if not provided.",
+)
 @click.argument("task-id", type=Task.from_str)
 @click.pass_context
 def assign_task(ctx, task_id: int, username: str | None):
+    """Assigm a task to a username"""
     client = PhabricatorClient()
     if not username:
         user = client.current_user()
@@ -291,10 +304,16 @@ def assign_task(ctx, task_id: int, username: str | None):
 
 
 @cli.command(name="move")
-@click.option("--column", type=str, required=True)
+@click.option(
+    "--column",
+    type=str,
+    required=True,
+    help="Name of destination column on the current project board",
+)
 @click.argument("task-id", type=Task.from_str)
 @click.pass_context
 def move_task(ctx, task_id: int, column: str | None):
+    """Move a task on its current project board"""
     client = PhabricatorClient()
     if not (
         current_milestone := client.get_project_current_milestone(
@@ -317,10 +336,15 @@ def move_task(ctx, task_id: int, column: str | None):
 
 
 @cli.command(name="comment")
-@click.option("--comment", type=str)
+@click.option(
+    "--comment",
+    type=str,
+    help="Comment text or path to a text file containing the comment body. If not provided, an editor will be opened.",
+)
 @click.argument("task-id", type=Task.from_str)
 @click.pass_context
 def comment_on_task(ctx, task_id: int, comment: str | None):
+    """Comment on a task"""
     client = PhabricatorClient()
     comment = text_from_cli_arg_or_fs_or_editor(comment)
     client.create_or_edit_task(task_id=task_id, params={"comment": comment})
