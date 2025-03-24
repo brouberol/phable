@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "phable"
+version = "0.1.0"
+description = "Command-line for Phabricator/Phorge tasks management"
+authors = ["Balthazar Rouberol <br@imap.cc>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+requests = "^2.32.3"
+click = "^8.1.8"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
