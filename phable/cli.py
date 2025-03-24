@@ -97,6 +97,11 @@ class PhabricatorClient:
             },
         )["result"]["data"][0]
 
+    def find_tasks_with_parent(self, parent_id: int) -> list[dict[str, Any]]:
+        return self._make_request(
+            "maniphest.search", params={"constraints[parentIDs][0]": parent_id}
+        )["result"]["data"]
+
     @cache
     def show_user(self, phid: str) -> dict[str, Any]:
         """Show a Maniphest user"""
@@ -135,6 +140,8 @@ def show_task(task_id: int, format: str = "plain"):
             ]
         else:
             tags = []
+        subtasks = client.find_tasks_with_parent(parent_id=task_id)
+        task["subtasks"] = subtasks
         if format == "json":
             click.echo(json.dumps(task))
         else:
@@ -147,6 +154,13 @@ def show_task(task_id: int, format: str = "plain"):
             click.echo(f"Status: {task['fields']['status']['name']}")
             click.echo(f"Priority: {task['fields']['priority']['name']}")
             click.echo(f"Description: {task['fields']['description']['raw']}")
+            if subtasks:
+                click.echo("Subtasks:")
+                for subtask in subtasks:
+                    status = f"{'[x]' if subtask['fields']['status']['value'] == 'resolved' else '[ ]'}"
+                    click.echo(
+                        f"{status} - {Task.from_int(subtask['id'])} - {subtask['fields']['name']}"
+                    )
     else:
         click.echo(f"Task T{task_id} not found")
 
