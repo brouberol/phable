@@ -186,9 +186,16 @@ def show_task(task_id: int, format: str = "plain"):
             tags = []
         subtasks = client.find_tasks_with_parent(parent_id=task_id)
         task["subtasks"] = subtasks
+        parent = client.find_subtask_parent(subtask_id=task_id)
+        task["parent"] = parent
         if format == "json":
             click.echo(json.dumps(task))
         else:
+            parent_str = (
+                f"{Task.from_int(parent['id'])} - {parent['fields']['name']}"
+                if parent
+                else ""
+            )
             click.echo(f"URL: {client.base_url}/{Task.from_int(task_id)}")
             click.echo(f"Task: {Task.from_int(task_id)}")
             click.echo(f"Title: {task['fields']['name']}")
@@ -198,12 +205,17 @@ def show_task(task_id: int, format: str = "plain"):
             click.echo(f"Status: {task['fields']['status']['name']}")
             click.echo(f"Priority: {task['fields']['priority']['name']}")
             click.echo(f"Description: {task['fields']['description']['raw']}")
+            click.echo(f"Parent: {parent_str}")
+            click.echo("Subtasks:")
             if subtasks:
-                click.echo("Subtasks:")
                 for subtask in subtasks:
                     status = f"{'[x]' if subtask['fields']['status']['value'] == 'resolved' else '[ ]'}"
+                    if subtask_owner_id := subtask["fields"]["ownerPHID"]:
+                        owner = client.show_user(subtask_owner_id)["fields"]["username"]
+                    else:
+                        owner = ""
                     click.echo(
-                        f"{status} - {Task.from_int(subtask['id'])} - {subtask['fields']['name']}"
+                        f"{status} - {Task.from_int(subtask['id'])} - @{owner:<10} - {subtask['fields']['name']}"
                     )
     else:
         click.echo(f"Task T{task_id} not found")
