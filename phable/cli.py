@@ -108,6 +108,16 @@ class PhabricatorClient:
             "maniphest.search", params={"constraints[parentIDs][0]": parent_id}
         )["result"]["data"]
 
+    def find_subtask_parent(self, subtask_id: int) -> dict[str, Any] | None:
+        return self._first(
+            self._make_request(
+                "maniphest.search", params={"constraints[subtaskIDs][0]": subtask_id}
+            )["result"]["data"]
+        )
+
+    def move_task_to_column(self, task_id: int, column_phid: str) -> dict[str, Any]:
+        return self.create_or_edit_task(task_id=task_id, params={"column": column_phid})
+
     @cache
     def show_user(self, phid: str) -> dict[str, Any] | None:
         """Show a Maniphest user"""
@@ -134,6 +144,21 @@ class PhabricatorClient:
 
     def assign_task_to_user(self, task_id: int, user_phid: int) -> dict[str, Any]:
         return self.create_or_edit_task(task_id=task_id, params={"owner": user_phid})
+
+    def list_project_columns(
+        self,
+        project_phid: str,
+    ) -> list[dict[str, Any]]:
+        return self._make_request(
+            "project.column.search", params={"constraints[projects][0]": project_phid}
+        )["result"]["data"]
+
+    def get_project_current_milestone(self, project_phid: str) -> dict[str, Any] | None:
+        columns = self.list_project_columns(project_phid)
+        for column in columns:
+            if column["fields"]["proxyPHID"] and not column["fields"]["isHidden"]:
+                return column
+
 
 
 @cli.command(name="show")
@@ -231,7 +256,7 @@ def create_task(
         parent = client.show_task(parent_id)
         task_params["parents.add"] = [parent["phid"]]
 
-    task = client.create_task(task_params)
+    task = client.create_or_edit_task(task_params)
     ctx.invoke(show_task, task_id=task["result"]["object"]["id"])
 
 
@@ -248,6 +273,32 @@ def assign_task(ctx, task_id: int, username: str | None):
         if not user:
             ctx.fail(f"User {username} was not found")
     client.assign_task_to_user(task_id=task_id, user_phid=user["phid"])
+
+
+@cli.command(name="move")
+@click.option("--column", type=str, required=True)
+@click.argument("task-id", type=Task.from_str)
+@click.pass_context
+def move_task(ctx, task_id: int, column: str | None):
+    client = PhabricatorClient()
+    if not (
+        current_milestone := client.get_project_current_milestone(
+            project_phid=os.environ["PHABRICATOR_DEFAULT_PROJECT_PHID"]
+        )
+    ):
+        ctx.fail("Current milestone not found")
+    current_milestone_columns = client.list_project_columns(
+        project_phid=current_milestone["fields"]["proxyPHID"]
+    )
+    for col in current_milestone_columns:
+        if col["fields"]["name"].lower() == column:
+            column_phid = col["phid"]
+            break
+    else:
+        ctx.fail(
+            f"Column {column} not found in milestone {current_milestone['fields']['name']}"
+        )
+    client.move_task_to_column(task_id=task_id, column_phid=column_phid)
 
 
 if __name__ == "__main__":
