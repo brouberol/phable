@@ -126,7 +126,7 @@ def show_task(task_id: int, format: str = "plain"):
     if task := client.show_task(task_id):
         author = client.show_user(phid=task["fields"]["authorPHID"])
         if owner_id := task["fields"]["ownerPHID"]:
-            owner = client.show_user(phid=owner_id)
+            owner = client.show_user(phid=owner_id)["fields"]["username"]
         else:
             owner = "Unassigned"
         if project_ids := task["attachments"]["projects"]["projectPHIDs"]:
