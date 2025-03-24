@@ -1,11 +1,14 @@
 import os
-from typing import Any
-import requests
-import click
-from functools import cache
-from pathlib import Path
 import tempfile
 import subprocess
+import json
+
+from typing import Any
+from functools import cache
+from pathlib import Path
+
+import requests
+import click
 
 
 @click.group()
@@ -110,8 +113,9 @@ class PhabricatorClient:
 
 
 @cli.command(name="show")
+@click.option("--format", type=click.Choice(("plain", "json")), default="plain")
 @click.argument("task-id", type=Task.from_str)
-def show_task(task_id: int):
+def show_task(task_id: int, format: str = "plain"):
     """Show information about a Maniphest task"""
     client = PhabricatorClient()
     if task := client.show_task(task_id):
@@ -131,15 +135,18 @@ def show_task(task_id: int):
             ]
         else:
             tags = []
-        click.echo(f"URL: {client.base_url}/{Task.from_int(task_id)}")
-        click.echo(f"Task: {Task.from_int(task_id)}")
-        click.echo(f"Title: {task['fields']['name']}")
-        click.echo(f"Author: {author['fields']['username']}")
-        click.echo(f"Owner: {owner}")
-        click.echo(f"Tags: {', '.join(tags)}")
-        click.echo(f"Status: {task['fields']['status']['name']}")
-        click.echo(f"Priority: {task['fields']['priority']['name']}")
-        click.echo(f"Description: {task['fields']['description']['raw']}")
+        if format == "json":
+            click.echo(json.dumps(task))
+        else:
+            click.echo(f"URL: {client.base_url}/{Task.from_int(task_id)}")
+            click.echo(f"Task: {Task.from_int(task_id)}")
+            click.echo(f"Title: {task['fields']['name']}")
+            click.echo(f"Author: {author['fields']['username']}")
+            click.echo(f"Owner: {owner}")
+            click.echo(f"Tags: {', '.join(tags)}")
+            click.echo(f"Status: {task['fields']['status']['name']}")
+            click.echo(f"Priority: {task['fields']['priority']['name']}")
+            click.echo(f"Description: {task['fields']['description']['raw']}")
     else:
         click.echo(f"Task T{task_id} not found")
 
