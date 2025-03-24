@@ -3,6 +3,9 @@ from typing import Any
 import requests
 import click
 from functools import cache
+from pathlib import Path
+import tempfile
+import subprocess
 
 
 @click.group()
@@ -53,13 +56,21 @@ class PhabricatorClient:
         except requests.RequestException as e:
             raise Exception(f"API request failed: {str(e)}")
 
-    def create_task(self, fields: dict[str, Any]) -> dict[str, Any]:
+    def create_task(self, params: dict[str, Any]) -> dict[str, Any]:
         """Create a new Maniphest task"""
-        return self._make_request("maniphest.create", params={"fields": fields})
+        raw_params = {}
+        for i, (key, value) in enumerate(params.items()):
+            raw_params[f"transactions[{i}][type]"] = key
+            if isinstance(value, list):
+                for j, subvalue in enumerate(value):
+                    raw_params[f"transactions[{i}][value][{j}]"] = subvalue
+            else:
+                raw_params[f"transactions[{i}][value]"] = value
+        return self._make_request("maniphest.edit", params=raw_params)
 
-    def edit_task(self, fields: dict[str, Any]) -> dict[str, Any]:
+    def edit_task(self, params: dict[str, Any]) -> dict[str, Any]:
         """Edit a Maniphest task"""
-        return self._make_request("maniphest.edit", params={"fields": fields})
+        return self._make_request("maniphest.edit", params=params)
 
     def show_task(self, task_id: int) -> dict[str, Any]:
         """Show a Maniphest task"""
@@ -88,34 +99,90 @@ class PhabricatorClient:
         return self._make_request("project.search", params=params)["result"]["data"]
 
 
-
-@cli.command()
+@cli.command(name="show")
 @click.argument("task-id", type=int)
-def show(task_id: int):
+def show_task(task_id: int):
     """Show information about a Maniphest task"""
     client = PhabricatorClient()
     if task := client.show_task(task_id):
         author = client.show_user(phid=task["fields"]["authorPHID"])
-        owner = client.show_user(phid=task["fields"]["ownerPHID"])
+        if owner_id := task["fields"]["ownerPHID"]:
+            owner = client.show_user(phid=owner_id)
+        else:
+            owner = "Unassigned"
         if project_ids := task["attachments"]["projects"]["projectPHIDs"]:
             tags = [
-                f"{project['fields']['parent']['name']} - {project['fields']['name']}"
-                if project["fields"]["parent"]
-                else project["fields"]["name"]
+                (
+                    f"{project['fields']['parent']['name']} - {project['fields']['name']}"
+                    if project["fields"]["parent"]
+                    else project["fields"]["name"]
+                )
                 for project in client.show_projects(phids=project_ids)
             ]
         else:
             tags = []
+        click.echo(f"URL: {client.base_url}/T{task_id}")
         click.echo(f"Task: T{task_id}")
         click.echo(f"Title: {task['fields']['name']}")
         click.echo(f"Author: {author['fields']['username']}")
-        click.echo(f"Owner: {owner['fields']['username']}")
+        click.echo(f"Owner: {owner}")
         click.echo(f"Tags: {', '.join(tags)}")
         click.echo(f"Status: {task['fields']['status']['name']}")
         click.echo(f"Priority: {task['fields']['priority']['name']}")
         click.echo(f"Description: {task['fields']['description']['raw']}")
     else:
         click.echo(f"Task T{task_id} not found")
+
+
+@cli.command(name="create")
+@click.option("--title", required=True, help="Title of the task")
+@click.option("--description", help="Description of the task")
+@click.option(
+    "--priority",
+    type=click.Choice(["unbreaknow", "high", "normal", "low", "needs-triage"]),
+    help="Priority level of the task",
+    default="normal",
+)
+@click.option("--project-tags", multiple=True, help="Project tags for the task")
+@click.option("--parent-id", type=int, help="ID of parent task")
+@click.option("--cc", multiple=True, help="Users to CC on the task")
+@click.pass_context
+def create_task(
+    ctx,
+    title: str,
+    description: str,
+    priority: str,
+    project_tags: list[str],
+    parent_id: str | None,
+    cc: list[str],
+):
+    """Create a new Maniphest task"""
+    client = PhabricatorClient()
+
+    if not description:
+        description_tmpfile = tempfile.NamedTemporaryFile(
+            encoding="utf-8", mode="w", suffix=".md"
+        )
+        subprocess.run([os.environ["EDITOR"], description_tmpfile.name])
+        description = Path(description_tmpfile.name).read_text()
+
+    try:
+        if (description_file := Path(description)).exists():
+            description = description_file.read_text()
+    except OSError:
+        pass
+    task_params = {
+        "title": title,
+        "description": description,
+        "projects.add": [os.environ["PHABRICATOR_DEFAULT_PROJECT_PHID"]],
+        "priority": priority,
+    }
+    if parent_id:
+        parent = client.show_task(parent_id)
+        task_params["parents.add"] = [parent["phid"]]
+
+    task = client.create_task(task_params)
+    ctx.invoke(show_task, task_id=task["result"]["object"]["id"])
 
 
 if __name__ == "__main__":
