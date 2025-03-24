@@ -14,6 +14,16 @@ def cli():
     pass
 
 
+class Task(int):
+    @classmethod
+    def from_str(cls, value: str) -> int:
+        return int(value.lstrip("T"))
+
+    @classmethod
+    def from_int(cls, value: int) -> str:
+        return f"T{value}"
+
+
 class PhabricatorClient:
     def __init__(self):
         self.base_url = os.getenv("PHABRICATOR_URL").rstrip("/")
@@ -100,7 +110,7 @@ class PhabricatorClient:
 
 
 @cli.command(name="show")
-@click.argument("task-id", type=int)
+@click.argument("task-id", type=Task.from_str)
 def show_task(task_id: int):
     """Show information about a Maniphest task"""
     client = PhabricatorClient()
@@ -121,8 +131,8 @@ def show_task(task_id: int):
             ]
         else:
             tags = []
-        click.echo(f"URL: {client.base_url}/T{task_id}")
-        click.echo(f"Task: T{task_id}")
+        click.echo(f"URL: {client.base_url}/{Task.from_int(task_id)}")
+        click.echo(f"Task: {Task.from_int(task_id)}")
         click.echo(f"Title: {task['fields']['name']}")
         click.echo(f"Author: {author['fields']['username']}")
         click.echo(f"Owner: {owner}")
