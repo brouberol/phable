@@ -29,8 +29,8 @@ class Task(int):
 
 class PhabricatorClient:
     def __init__(self):
-        self.base_url = os.getenv("PHABRICATOR_URL").rstrip("/")
-        self.token = os.getenv("PHABRICATOR_TOKEN")
+        self.base_url = os.environ["PHABRICATOR_URL"].rstrip("/")
+        self.token = os.environ["PHABRICATOR_TOKEN"]
         self.session = requests.Session()
         self.timeout = 5
 
