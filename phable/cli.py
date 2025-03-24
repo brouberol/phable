@@ -118,6 +118,9 @@ class PhabricatorClient:
     def move_task_to_column(self, task_id: int, column_phid: str) -> dict[str, Any]:
         return self.create_or_edit_task(task_id=task_id, params={"column": column_phid})
 
+    def mark_task_as_resolved(self, task_id: int) -> dict[str, Any]:
+        return self.create_or_edit_task(task_id=task_id, params={"status": "Resolved"})
+
     @cache
     def show_user(self, phid: str) -> dict[str, Any] | None:
         """Show a Maniphest user"""
@@ -333,6 +336,8 @@ def move_task(ctx, task_id: int, column: str | None):
             f"Column {column} not found in milestone {current_milestone['fields']['name']}"
         )
     client.move_task_to_column(task_id=task_id, column_phid=column_phid)
+    if column["fields"]["name"].lower() == "done":
+        client.mark_task_as_resolved(task_id)
 
 
 @cli.command(name="comment")
