@@ -23,7 +23,7 @@ class PhabricatorClient:
 
         if not self.base_url or not self.token:
             raise ValueError(
-                "PHABRICATOR_URL and PHABRICATOR_TOKEN must be set in you envionment"
+                "PHABRICATOR_URL and PHABRICATOR_TOKEN must be set in your envionment"
             )
 
     def _make_request(
