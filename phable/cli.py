@@ -39,6 +39,10 @@ class PhabricatorClient:
                 "PHABRICATOR_URL and PHABRICATOR_TOKEN must be set in your envionment"
             )
 
+    def _first(self, result_set: list):
+        if result_set:
+            return result_set[0]
+
     def _make_request(
         self,
         path: str,
@@ -50,7 +54,7 @@ class PhabricatorClient:
         headers |= {
             "Content-Type": "application/x-www-form-urlencoded",
         }
-
+        params = params or {}
         data = {}
         data["api.token"] = self.token
         data["output"] = "json"
@@ -65,12 +69,16 @@ class PhabricatorClient:
             )
 
             response.raise_for_status()
+            resp_json = response.json()
+            if resp_json["error_code"]:
+                raise Exception(f"API request failed: {resp_json}")
             return response.json()
         except requests.RequestException as e:
             raise Exception(f"API request failed: {str(e)}")
 
-    def create_task(self, params: dict[str, Any]) -> dict[str, Any]:
-        """Create a new Maniphest task"""
+    def create_or_edit_task(
+        self, params: dict[str, Any], task_id: int | None = None
+    ) -> dict[str, Any]:
         raw_params = {}
         for i, (key, value) in enumerate(params.items()):
             raw_params[f"transactions[{i}][type]"] = key
@@ -79,11 +87,9 @@ class PhabricatorClient:
                     raw_params[f"transactions[{i}][value][{j}]"] = subvalue
             else:
                 raw_params[f"transactions[{i}][value]"] = value
+        if task_id:
+            raw_params["objectIdentifier"] = task_id
         return self._make_request("maniphest.edit", params=raw_params)
-
-    def edit_task(self, params: dict[str, Any]) -> dict[str, Any]:
-        """Edit a Maniphest task"""
-        return self._make_request("maniphest.edit", params=params)
 
     def show_task(self, task_id: int) -> dict[str, Any]:
         """Show a Maniphest task"""
@@ -103,11 +109,12 @@ class PhabricatorClient:
         )["result"]["data"]
 
     @cache
-    def show_user(self, phid: str) -> dict[str, Any]:
+    def show_user(self, phid: str) -> dict[str, Any] | None:
         """Show a Maniphest user"""
-        return self._make_request(
+        user = self._make_request(
             "user.search", params={"constraints[phids][0]": phid}
-        )["result"]["data"][0]
+        )["result"]["data"]
+        return self._first(user)
 
     def show_projects(self, phids: list[str]) -> dict[str, Any]:
         """Show a Maniphest project"""
@@ -115,6 +122,18 @@ class PhabricatorClient:
         for i, phid in enumerate(phids):
             params[f"constraints[phids][{i}]"] = phid
         return self._make_request("project.search", params=params)["result"]["data"]
+
+    def current_user(self) -> dict[str, Any]:
+        return self._make_request("user.whoami")["result"]
+
+    def find_user_by_username(self, username: str) -> dict[str, Any] | None:
+        user = self._make_request(
+            "user.search", params={"constraints[usernames][0]": username}
+        )["result"]["data"]
+        return self._first(user)
+
+    def assign_task_to_user(self, task_id: int, user_phid: int) -> dict[str, Any]:
+        return self.create_or_edit_task(task_id=task_id, params={"owner": user_phid})
 
 
 @cli.command(name="show")
@@ -214,6 +233,21 @@ def create_task(
 
     task = client.create_task(task_params)
     ctx.invoke(show_task, task_id=task["result"]["object"]["id"])
+
+
+@cli.command(name="assign")
+@click.option("--username", required=False)
+@click.argument("task-id", type=Task.from_str)
+@click.pass_context
+def assign_task(ctx, task_id: int, username: str | None):
+    client = PhabricatorClient()
+    if not username:
+        user = client.current_user()
+    else:
+        user = client.find_user_by_username(username)
+        if not user:
+            ctx.fail(f"User {username} was not found")
+    client.assign_task_to_user(task_id=task_id, user_phid=user["phid"])
 
 
 if __name__ == "__main__":
