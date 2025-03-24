@@ -160,6 +160,21 @@ class PhabricatorClient:
                 return column
 
 
+def text_from_cli_arg_or_fs_or_editor(body_or_path: str) -> str:
+    try:
+        if body_or_path is not None and (local_file := Path(body_or_path)).exists():
+            return local_file.read_text()
+    except OSError:
+        pass
+
+    if not body_or_path:
+        txt_tmpfile = tempfile.NamedTemporaryFile(
+            encoding="utf-8", mode="w", suffix=".md"
+        )
+        subprocess.run([os.environ["EDITOR"], txt_tmpfile.name])
+        return Path(txt_tmpfile.name).read_text()
+    return body_or_path
+
 
 @cli.command(name="show")
 @click.option("--format", type=click.Choice(("plain", "json")), default="plain")
@@ -245,19 +260,7 @@ def create_task(
 ):
     """Create a new Maniphest task"""
     client = PhabricatorClient()
-
-    if not description:
-        description_tmpfile = tempfile.NamedTemporaryFile(
-            encoding="utf-8", mode="w", suffix=".md"
-        )
-        subprocess.run([os.environ["EDITOR"], description_tmpfile.name])
-        description = Path(description_tmpfile.name).read_text()
-
-    try:
-        if (description_file := Path(description)).exists():
-            description = description_file.read_text()
-    except OSError:
-        pass
+    description = text_from_cli_arg_or_fs_or_editor(description)
     task_params = {
         "title": title,
         "description": description,
@@ -311,6 +314,16 @@ def move_task(ctx, task_id: int, column: str | None):
             f"Column {column} not found in milestone {current_milestone['fields']['name']}"
         )
     client.move_task_to_column(task_id=task_id, column_phid=column_phid)
+
+
+@cli.command(name="comment")
+@click.option("--comment", type=str)
+@click.argument("task-id", type=Task.from_str)
+@click.pass_context
+def comment_on_task(ctx, task_id: int, comment: str | None):
+    client = PhabricatorClient()
+    comment = text_from_cli_arg_or_fs_or_editor(comment)
+    client.create_or_edit_task(task_id=task_id, params={"comment": comment})
 
 
 if __name__ == "__main__":
