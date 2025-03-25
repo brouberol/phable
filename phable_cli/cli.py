@@ -210,7 +210,7 @@ def move_task(ctx, task_ids: list[int], column: str | None):
         project_phid=current_milestone["fields"]["proxyPHID"]
     )
     for col in current_milestone_columns:
-        if col["fields"]["name"].lower() == column:
+        if col["fields"]["name"].lower() == column.lower():
             column_phid = col["phid"]
             break
     else:
