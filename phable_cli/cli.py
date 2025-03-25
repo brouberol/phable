@@ -219,7 +219,7 @@ def move_task(ctx, task_ids: list[int], column: str | None):
         )
     for task_id in task_ids:
         client.move_task_to_column(task_id=task_id, column_phid=column_phid)
-        if column["fields"]["name"].lower() == "done":
+        if column.lower() == "done":
             client.mark_task_as_resolved(task_id)
 
 
