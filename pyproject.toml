@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "phable"
+name = "phable-cli"
 version = "0.1.0"
-description = "Command-line for Phabricator/Phorge tasks management"
+description = "Manage Phabricator tasks from the comfort of your terminal"
 authors = ["Balthazar Rouberol <br@imap.cc>"]
 license = "MIT"
 readme = "README.md"
@@ -12,7 +12,7 @@ requests = "^2.32.3"
 click = "^8.1.8"
 
 [tool.poetry.scripts]
-phable = 'phable.cli:cli'
+phable = 'phable_cli.cli:cli'
 
 [build-system]
 requires = ["poetry-core"]
