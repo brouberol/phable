@@ -6,6 +6,8 @@ import click
 from .phabricator import PhabricatorClient
 from .utils import text_from_cli_arg_or_fs_or_editor
 
+VARIADIC = -1  # Used for click variadic arguments
+
 
 @click.group()
 def cli():
@@ -154,7 +156,7 @@ def create_task(
     required=False,
     help="The username to assign the task to. Self-assign the task if not provided.",
 )
-@click.argument("task-ids", type=Task.from_str, nargs=-1)
+@click.argument("task-ids", type=Task.from_str, nargs=VARIADIC)
 @click.pass_context
 def assign_task(ctx, task_ids: list[int], username: str | None):
     """Assign one or multiple task ids to a username
@@ -183,7 +185,7 @@ def assign_task(ctx, task_ids: list[int], username: str | None):
     required=True,
     help="Name of destination column on the current project board",
 )
-@click.argument("task-ids", type=Task.from_str, nargs=1)
+@click.argument("task-ids", type=Task.from_str, nargs=VARIADIC)
 @click.pass_context
 def move_task(ctx, task_ids: list[int], column: str | None):
     """Move one or several task on their current project board
