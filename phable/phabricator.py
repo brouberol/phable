@@ -1,8 +1,11 @@
 import os
 import requests
 
-from typing import Any
+from typing import Any, TypeVar
 from functools import cache
+
+
+T = TypeVar("T")
 
 
 class PhabricatorClient:
@@ -23,7 +26,7 @@ class PhabricatorClient:
                 "PHABRICATOR_URL and PHABRICATOR_TOKEN must be set in your envionment"
             )
 
-    def _first(self, result_set: list):
+    def _first(self, result_set: list[T]) -> T:
         if result_set:
             return result_set[0]
 
