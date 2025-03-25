@@ -32,7 +32,14 @@ class Task(int):
 )
 @click.argument("task-id", type=Task.from_str)
 def show_task(task_id: int, format: str = "plain"):
-    """Show task details"""
+    """Show task details
+
+    \b
+    Examples:
+    $ phable show T123456                 # show task details as plaintext
+    $ phable show T123456  --format=json  # show task details as json
+
+    """
     client = PhabricatorClient()
     if task := client.show_task(task_id):
         author = client.show_user(phid=task["fields"]["authorPHID"])
@@ -109,7 +116,22 @@ def create_task(
     priority: str,
     parent_id: str | None,
 ):
-    """Create a new task"""
+    """Create a new task
+
+    \b
+    Examples:
+    # Create a task with associated title, priority and desription
+    $ phable create --title 'Do the thing!' --priority high --description 'Address the thing right now'
+    \b
+    # Create a task with a given parent
+    $ phable create --title 'A subtask' --description 'Subtask description' --parent-id T123456
+    \b
+    # Create a task with a long description by pointing it to a description file
+    $ phable create --title 'A task' --description path/to/description.txt
+    \b
+    # Create a task with a long description by writing it in your favorite text editor
+    $ phable create --title 'A task'
+    """
     client = PhabricatorClient()
     description = text_from_cli_arg_or_fs_or_editor(description)
     task_params = {
@@ -135,7 +157,14 @@ def create_task(
 @click.argument("task-ids", type=Task.from_str, nargs=-1)
 @click.pass_context
 def assign_task(ctx, task_ids: list[int], username: str | None):
-    """Assign one or multiple task ids to a username"""
+    """Assign one or multiple task ids to a username
+
+    \b
+    Examples:
+    $ phable assign T123456             # self assign task
+    $ phable assign T123456  brouberol  # asign to username
+
+    """
     client = PhabricatorClient()
     if not username:
         user = client.current_user()
@@ -157,7 +186,17 @@ def assign_task(ctx, task_ids: list[int], username: str | None):
 @click.argument("task-ids", type=Task.from_str, nargs=1)
 @click.pass_context
 def move_task(ctx, task_ids: list[int], column: str | None):
-    """Move one or several task on their current project board"""
+    """Move one or several task on their current project board
+
+    If the task is moved to a 'Done' column, it will be automatically
+    marked as 'Resolved' as well.
+
+    \b
+    Example:
+    $ phable move T123456 --column 'In Progress'
+    $ phable move T123456 T234567 --column 'Done'
+
+    """
     client = PhabricatorClient()
     if not (
         current_milestone := client.get_project_current_milestone(
@@ -189,9 +228,15 @@ def move_task(ctx, task_ids: list[int], column: str | None):
     help="Comment text or path to a text file containing the comment body. If not provided, an editor will be opened.",
 )
 @click.argument("task-id", type=Task.from_str)
-@click.pass_context
-def comment_on_task(ctx, task_id: int, comment: str | None):
-    """Comment on a task"""
+def comment_on_task(task_id: int, comment: str | None):
+    """Add a comment to a task
+
+    \b
+    Example:
+    $ phable comment T123456 --comment 'hello'              # set comment body from the cli itself
+    $ phable comment T123456 --comment path/to/comment.txt  # set comment body from a text file
+    $ phable comment T123456                                # set comment body from your own text editor
+    """
     client = PhabricatorClient()
     comment = text_from_cli_arg_or_fs_or_editor(comment)
     client.create_or_edit_task(task_id=task_id, params={"comment": comment})
