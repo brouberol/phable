@@ -9,7 +9,7 @@ from .utils import text_from_cli_arg_or_fs_or_editor
 
 @click.group()
 def cli():
-    """Phabricator Maniphest CLI"""
+    """Manage Phabricator tasks from the comfort of your terminal"""
     pass
 
 
