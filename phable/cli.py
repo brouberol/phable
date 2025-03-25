@@ -85,7 +85,7 @@ def show_task(task_id: int, format: str = "plain"):
                         f"{status} - {Task.from_int(subtask['id'])} - @{owner:<10} - {subtask['fields']['name']}"
                     )
     else:
-        click.echo(f"Task T{task_id} not found")
+        click.echo(f"Task {Task.from_int(task_id)} not found")
 
 
 @cli.command(name="create")
