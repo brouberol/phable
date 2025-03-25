@@ -51,9 +51,9 @@ def show_task(task_id: int, format: str = "plain"):
             ]
         else:
             tags = []
-        subtasks = client.find_tasks_with_parent(parent_id=task_id)
+        subtasks = client.find_subtasks(parent_id=task_id)
         task["subtasks"] = subtasks
-        parent = client.find_subtask_parent(subtask_id=task_id)
+        parent = client.find_parent_task(subtask_id=task_id)
         task["parent"] = parent
         if format == "json":
             click.echo(json.dumps(task))

@@ -88,13 +88,13 @@ class PhabricatorClient:
             },
         )["result"]["data"][0]
 
-    def find_tasks_with_parent(self, parent_id: int) -> list[dict[str, Any]]:
+    def find_subtasks(self, parent_id: int) -> list[dict[str, Any]]:
         """Return details of all Maniphest subtasks of the provided task id"""
         return self._make_request(
             "maniphest.search", params={"constraints[parentIDs][0]": parent_id}
         )["result"]["data"]
 
-    def find_subtask_parent(self, subtask_id: int) -> dict[str, Any] | None:
+    def find_parent_task(self, subtask_id: int) -> dict[str, Any] | None:
         """Return details of the parent Maniphest task for the provided task id"""
         return self._first(
             self._make_request(
