@@ -100,18 +100,14 @@ def show_task(task_id: int, format: str = "plain"):
     help="Priority level of the task",
     default="normal",
 )
-# @click.option("--project-tags", multiple=True, help="Project tags for the task")
 @click.option("--parent-id", type=int, help="ID of parent task")
-# @click.option("--cc", multiple=True, help="Users to CC on the task")
 @click.pass_context
 def create_task(
     ctx,
     title: str,
     description: str,
     priority: str,
-    project_tags: list[str],
     parent_id: str | None,
-    cc: list[str],
 ):
     """Create a new Maniphest task"""
     client = PhabricatorClient()
