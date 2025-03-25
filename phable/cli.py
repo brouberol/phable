@@ -154,10 +154,10 @@ def assign_task(ctx, task_ids: list[int], username: str | None):
     required=True,
     help="Name of destination column on the current project board",
 )
-@click.argument("task-id", type=Task.from_str)
+@click.argument("task-ids", type=Task.from_str, nargs=1)
 @click.pass_context
-def move_task(ctx, task_id: int, column: str | None):
-    """Move a task on its current project board"""
+def move_task(ctx, task_ids: list[int], column: str | None):
+    """Move one or several task on their current project board"""
     client = PhabricatorClient()
     if not (
         current_milestone := client.get_project_current_milestone(
@@ -176,9 +176,10 @@ def move_task(ctx, task_id: int, column: str | None):
         ctx.fail(
             f"Column {column} not found in milestone {current_milestone['fields']['name']}"
         )
-    client.move_task_to_column(task_id=task_id, column_phid=column_phid)
-    if column["fields"]["name"].lower() == "done":
-        client.mark_task_as_resolved(task_id)
+    for task_id in task_ids:
+        client.move_task_to_column(task_id=task_id, column_phid=column_phid)
+        if column["fields"]["name"].lower() == "done":
+            client.mark_task_as_resolved(task_id)
 
 
 @cli.command(name="comment")
