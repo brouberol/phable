@@ -32,7 +32,7 @@ class Task(int):
 )
 @click.argument("task-id", type=Task.from_str)
 def show_task(task_id: int, format: str = "plain"):
-    """Show information about a Phabricator task"""
+    """Show task details"""
     client = PhabricatorClient()
     if task := client.show_task(task_id):
         author = client.show_user(phid=task["fields"]["authorPHID"])
@@ -109,7 +109,7 @@ def create_task(
     priority: str,
     parent_id: str | None,
 ):
-    """Create a new Maniphest task"""
+    """Create a new task"""
     client = PhabricatorClient()
     description = text_from_cli_arg_or_fs_or_editor(description)
     task_params = {
