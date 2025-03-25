@@ -111,7 +111,7 @@ class PhabricatorClient:
 
     def mark_task_as_resolved(self, task_id: int) -> dict[str, Any]:
         """Set the status of the argument task to Resolved"""
-        return self.create_or_edit_task(task_id=task_id, params={"status": "Resolved"})
+        return self.create_or_edit_task(task_id=task_id, params={"status": "resolved"})
 
     @cache
     def show_user(self, phid: str) -> dict[str, Any] | None:
