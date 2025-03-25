@@ -107,7 +107,7 @@ def show_task(task_id: int, format: str = "plain"):
     help="Priority level of the task",
     default="normal",
 )
-@click.option("--parent-id", type=int, help="ID of parent task")
+@click.option("--parent-id", type=Task.from_str, help="ID of parent task")
 @click.pass_context
 def create_task(
     ctx,
