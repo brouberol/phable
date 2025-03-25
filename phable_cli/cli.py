@@ -10,6 +10,7 @@ VARIADIC = -1  # Used for click variadic arguments
 
 
 @click.group()
+@click.version_option()
 def cli():
     """Manage Phabricator tasks from the comfort of your terminal"""
     pass
