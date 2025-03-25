@@ -132,10 +132,10 @@ def create_task(
     required=False,
     help="The username to assign the task to. Self-assign the task if not provided.",
 )
-@click.argument("task-id", type=Task.from_str)
+@click.argument("task-ids", type=Task.from_str, nargs=-1)
 @click.pass_context
-def assign_task(ctx, task_id: int, username: str | None):
-    """Assigm a task to a username"""
+def assign_task(ctx, task_ids: list[int], username: str | None):
+    """Assign one or multiple task ids to a username"""
     client = PhabricatorClient()
     if not username:
         user = client.current_user()
@@ -143,7 +143,8 @@ def assign_task(ctx, task_id: int, username: str | None):
         user = client.find_user_by_username(username)
         if not user:
             ctx.fail(f"User {username} was not found")
-    client.assign_task_to_user(task_id=task_id, user_phid=user["phid"])
+    for task_id in task_ids:
+        client.assign_task_to_user(task_id=task_id, user_phid=user["phid"])
 
 
 @cli.command(name="move")
