@@ -1,7 +1,7 @@
 # phable
 Manage Phabricator tasks from the comfort of your terminal.
 
-`phable` is a CLI allowing you to manage your [Phorge/Phabricator](https://we.forge.it) tasks.
+`phable` is a CLI allowing you to manage your [Phorge/Phabricator](https://we.phorge.it) tasks.
 
 It tries to be very simple and not go overboard with features. You can:
 - create a new task
