@@ -2,6 +2,7 @@ import os
 import json
 
 import click
+from click import Context
 
 from .phabricator import PhabricatorClient
 from .utils import text_from_cli_arg_or_fs_or_editor
@@ -186,9 +187,17 @@ def assign_task(ctx, task_ids: list[int], username: str | None):
     required=True,
     help="Name of destination column on the current project board",
 )
+@click.option(
+    "--milestone/--no-milestone",
+    default=False,
+    help=(
+        "If --milestone is passed, the task will be moved onto the current project's associated "
+        "milestone board, instead of the project board itself"
+    ),
+)
 @click.argument("task-ids", type=Task.from_str, nargs=VARIADIC)
 @click.pass_context
-def move_task(ctx, task_ids: list[int], column: str | None):
+def move_task(ctx: Context, task_ids: list[int], column: str | None, milestone: bool) -> None:
     """Move one or several task on their current project board
 
     If the task is moved to a 'Done' column, it will be automatically
@@ -200,28 +209,20 @@ def move_task(ctx, task_ids: list[int], column: str | None):
     $ phable move T123456 T234567 --column 'Done'
 
     """
-    client = PhabricatorClient()
-    if not (
-        current_milestone_phid := client.get_project_current_milestone_phid(
-            project_phid=os.environ["PHABRICATOR_DEFAULT_PROJECT_PHID"]
+
+    try:
+        client = PhabricatorClient()
+        target_project_phid = client.get_main_project_or_milestone(
+            milestone, os.environ["PHABRICATOR_DEFAULT_PROJECT_PHID"]
         )
-    ):
-        ctx.fail("Current milestone not found")
-    current_milestone_columns = client.list_project_columns(
-        project_phid=current_milestone_phid
-    )
-    for col in current_milestone_columns:
-        if col["fields"]["name"].lower() == column.lower():
-            column_phid = col["phid"]
-            break
-    else:
-        ctx.fail(
-            f"Column {column} not found in milestone {current_milestone_phid}"
-        )
-    for task_id in task_ids:
-        client.move_task_to_column(task_id=task_id, column_phid=column_phid)
-        if column.lower() == "done":
-            client.mark_task_as_resolved(task_id)
+        target_column_phid = client.find_column_in_project(target_project_phid, column)
+
+        for task_id in task_ids:
+            client.move_task_to_column(task_id=task_id, column_phid=target_column_phid)
+            if column.lower() == "done":
+                client.mark_task_as_resolved(task_id)
+    except ValueError as ve:
+        ctx.fail(ve)
 
 
 @cli.command(name="comment")
