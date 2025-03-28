@@ -202,13 +202,13 @@ def move_task(ctx, task_ids: list[int], column: str | None):
     """
     client = PhabricatorClient()
     if not (
-        current_milestone := client.get_project_current_milestone(
+        current_milestone_phid := client.get_project_current_milestone_phid(
             project_phid=os.environ["PHABRICATOR_DEFAULT_PROJECT_PHID"]
         )
     ):
         ctx.fail("Current milestone not found")
     current_milestone_columns = client.list_project_columns(
-        project_phid=current_milestone["fields"]["proxyPHID"]
+        project_phid=current_milestone_phid
     )
     for col in current_milestone_columns:
         if col["fields"]["name"].lower() == column.lower():
@@ -216,7 +216,7 @@ def move_task(ctx, task_ids: list[int], column: str | None):
             break
     else:
         ctx.fail(
-            f"Column {column} not found in milestone {current_milestone['fields']['name']}"
+            f"Column {column} not found in milestone {current_milestone_phid}"
         )
     for task_id in task_ids:
         client.move_task_to_column(task_id=task_id, column_phid=column_phid)

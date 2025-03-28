@@ -152,13 +152,13 @@ class PhabricatorClient:
             "project.column.search", params={"constraints[projects][0]": project_phid}
         )["result"]["data"]
 
-    def get_project_current_milestone(self, project_phid: str) -> dict[str, Any] | None:
-        """Return the first non hidden column associated with a subproject.
+    def get_project_current_milestone_phid(self, project_phid: str) -> str | None:
+        """Return the PHID of the current milestone associated with the given project.
 
-        We assume it to be associated with the current milestone.
-
+        We assume that the current milestone is displayed on the project's
+        board as the first non-hidden column.
         """
         columns = self.list_project_columns(project_phid)
         for column in columns:
             if column["fields"]["proxyPHID"] and not column["fields"]["isHidden"]:
-                return column
+                return column["fields"]["proxyPHID"]
