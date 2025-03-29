@@ -152,13 +152,45 @@ class PhabricatorClient:
             "project.column.search", params={"constraints[projects][0]": project_phid}
         )["result"]["data"]
 
-    def get_project_current_milestone(self, project_phid: str) -> dict[str, Any] | None:
-        """Return the first non hidden column associated with a subproject.
+    def get_project_current_milestone_phid(self, project_phid: str) -> str | None:
+        """Return the PHID of the current milestone associated with the given project.
 
-        We assume it to be associated with the current milestone.
-
+        We assume that the current milestone is displayed on the project's
+        board as the first non-hidden column.
         """
         columns = self.list_project_columns(project_phid)
         for column in columns:
             if column["fields"]["proxyPHID"] and not column["fields"]["isHidden"]:
-                return column
+                return column["fields"]["proxyPHID"]
+
+    def get_main_project_or_milestone(self, milestone: bool, project_phid: str) -> str:
+        """Returns either the given project, or the current milestone of the given project."""
+        if not milestone:
+            return project_phid
+
+        target_project_phid = self.get_project_current_milestone_phid(
+            project_phid=(project_phid)
+        )
+
+        if not target_project_phid:
+            raise ValueError(f"Could not find a milestone in {project_phid}")
+
+        return target_project_phid
+
+    def find_column_in_project(self, project_phid: str, column_name: str) -> str:
+        """Finds a column in a project.
+
+        :raises ValueError if the column isn't found"""
+        potential_target_columns = self.list_project_columns(
+            project_phid=project_phid
+        )
+
+        for col in potential_target_columns:
+            if col["fields"]["name"].lower() == column_name.lower():
+                column_phid = col["phid"]
+                break
+        else:
+            raise ValueError(
+                f"Column {column_name} not found in milestone {project_phid}"
+            )
+        return column_phid
