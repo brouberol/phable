@@ -1,10 +1,10 @@
 import json
-import os
 from typing import Optional
 
 import click
 from click import Context
 
+from .config import config
 from .phabricator import PhabricatorClient
 from .utils import text_from_cli_arg_or_fs_or_editor
 
@@ -142,7 +142,7 @@ def create_task(
     task_params = {
         "title": title,
         "description": description,
-        "projects.add": [os.environ["PHABRICATOR_DEFAULT_PROJECT_PHID"]],
+        "projects.add": [config.phabricator_default_project_phid],
         "priority": priority,
     }
     if parent_id:
@@ -216,7 +216,7 @@ def move_task(
     try:
         client = PhabricatorClient()
         target_project_phid = client.get_main_project_or_milestone(
-            milestone, os.environ["PHABRICATOR_DEFAULT_PROJECT_PHID"]
+            milestone, config.phabricator_default_project_phid
         )
         target_column_phid = client.find_column_in_project(target_project_phid, column)
 
