@@ -197,7 +197,9 @@ def assign_task(ctx, task_ids: list[int], username: str | None):
 )
 @click.argument("task-ids", type=Task.from_str, nargs=VARIADIC)
 @click.pass_context
-def move_task(ctx: Context, task_ids: list[int], column: str | None, milestone: bool) -> None:
+def move_task(
+    ctx: Context, task_ids: list[int], column: str | None, milestone: bool
+) -> None:
     """Move one or several task on their current project board
 
     If the task is moved to a 'Done' column, it will be automatically

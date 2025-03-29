@@ -181,9 +181,7 @@ class PhabricatorClient:
         """Finds a column in a project.
 
         :raises ValueError if the column isn't found"""
-        potential_target_columns = self.list_project_columns(
-            project_phid=project_phid
-        )
+        potential_target_columns = self.list_project_columns(project_phid=project_phid)
 
         for col in potential_target_columns:
             if col["fields"]["name"].lower() == column_name.lower():
