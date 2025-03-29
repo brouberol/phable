@@ -1,9 +1,8 @@
 import os
-import requests
-
-from typing import Any, TypeVar
 from functools import cache
+from typing import Any, Optional, TypeVar
 
+import requests
 
 T = TypeVar("T")
 
@@ -64,7 +63,7 @@ class PhabricatorClient:
             raise Exception(f"API request failed: {str(e)}")
 
     def create_or_edit_task(
-        self, params: dict[str, Any], task_id: int | None = None
+        self, params: dict[str, Any], task_id: Optional[int] = None
     ) -> dict[str, Any]:
         """Create or edit (if a task_id is provided) a Maniphest task."""
         raw_params = {}
@@ -97,7 +96,7 @@ class PhabricatorClient:
             "maniphest.search", params={"constraints[parentIDs][0]": parent_id}
         )["result"]["data"]
 
-    def find_parent_task(self, subtask_id: int) -> dict[str, Any] | None:
+    def find_parent_task(self, subtask_id: int) -> Optional[dict[str, Any]]:
         """Return details of the parent Maniphest task for the provided task id"""
         return self._first(
             self._make_request(
@@ -114,7 +113,7 @@ class PhabricatorClient:
         return self.create_or_edit_task(task_id=task_id, params={"status": "resolved"})
 
     @cache
-    def show_user(self, phid: str) -> dict[str, Any] | None:
+    def show_user(self, phid: str) -> Optional[dict[str, Any]]:
         """Show details of a Maniphest user"""
         user = self._make_request(
             "user.search", params={"constraints[phids][0]": phid}
@@ -132,7 +131,7 @@ class PhabricatorClient:
         """Return details of the user associated with the phabricator API token"""
         return self._make_request("user.whoami")["result"]
 
-    def find_user_by_username(self, username: str) -> dict[str, Any] | None:
+    def find_user_by_username(self, username: str) -> Optional[dict[str, Any]]:
         """Return user details of the user with the provided username"""
         user = self._make_request(
             "user.search", params={"constraints[usernames][0]": username}
@@ -152,7 +151,7 @@ class PhabricatorClient:
             "project.column.search", params={"constraints[projects][0]": project_phid}
         )["result"]["data"]
 
-    def get_project_current_milestone_phid(self, project_phid: str) -> str | None:
+    def get_project_current_milestone_phid(self, project_phid: str) -> Optional[str]:
         """Return the PHID of the current milestone associated with the given project.
 
         We assume that the current milestone is displayed on the project's

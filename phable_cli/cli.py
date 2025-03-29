@@ -1,5 +1,6 @@
-import os
 import json
+import os
+from typing import Optional
 
 import click
 from click import Context
@@ -118,7 +119,7 @@ def create_task(
     title: str,
     description: str,
     priority: str,
-    parent_id: str | None,
+    parent_id: Optional[str],
 ):
     """Create a new task
 
@@ -160,7 +161,7 @@ def create_task(
 )
 @click.argument("task-ids", type=Task.from_str, nargs=VARIADIC)
 @click.pass_context
-def assign_task(ctx, task_ids: list[int], username: str | None):
+def assign_task(ctx, task_ids: list[int], username: Optional[str]):
     """Assign one or multiple task ids to a username
 
     \b
@@ -198,7 +199,7 @@ def assign_task(ctx, task_ids: list[int], username: str | None):
 @click.argument("task-ids", type=Task.from_str, nargs=VARIADIC)
 @click.pass_context
 def move_task(
-    ctx: Context, task_ids: list[int], column: str | None, milestone: bool
+    ctx: Context, task_ids: list[int], column: Optional[str], milestone: bool
 ) -> None:
     """Move one or several task on their current project board
 
@@ -234,7 +235,7 @@ def move_task(
     help="Comment text or path to a text file containing the comment body. If not provided, an editor will be opened.",
 )
 @click.argument("task-id", type=Task.from_str)
-def comment_on_task(task_id: int, comment: str | None):
+def comment_on_task(task_id: int, comment: Optional[str]):
     """Add a comment to a task
 
     \b
