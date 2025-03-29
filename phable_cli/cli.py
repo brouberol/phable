@@ -1,14 +1,19 @@
+import atexit
 import json
 from typing import Optional
 
 import click
 from click import Context
 
+from .cache import cache
 from .config import config
 from .phabricator import PhabricatorClient
 from .utils import text_from_cli_arg_or_fs_or_editor
 
 VARIADIC = -1  # Used for click variadic arguments
+
+# Dump the in-memory cache to disk when existing the CLI
+atexit.register(cache.dump)
 
 
 @click.group()

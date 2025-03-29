@@ -1,8 +1,8 @@
-from functools import cache
 from typing import Any, Optional, TypeVar
-
+from datetime import timedelta
 import requests
 
+from .cache import cached
 from .config import config
 
 T = TypeVar("T")
@@ -92,6 +92,7 @@ class PhabricatorClient:
             "maniphest.search", params={"constraints[parentIDs][0]": parent_id}
         )["result"]["data"]
 
+    @cached("task_parent")
     def find_parent_task(self, subtask_id: int) -> Optional[dict[str, Any]]:
         """Return details of the parent Maniphest task for the provided task id"""
         return self._first(
@@ -108,7 +109,7 @@ class PhabricatorClient:
         """Set the status of the argument task to Resolved"""
         return self.create_or_edit_task(task_id=task_id, params={"status": "resolved"})
 
-    @cache
+    @cached
     def show_user(self, phid: str) -> Optional[dict[str, Any]]:
         """Show details of a Maniphest user"""
         user = self._make_request(
@@ -116,6 +117,7 @@ class PhabricatorClient:
         )["result"]["data"]
         return self._first(user)
 
+    @cached
     def show_projects(self, phids: list[str]) -> dict[str, Any]:
         """Show details of the provided Maniphest projects"""
         params = {}
@@ -123,10 +125,12 @@ class PhabricatorClient:
             params[f"constraints[phids][{i}]"] = phid
         return self._make_request("project.search", params=params)["result"]["data"]
 
+    @cached
     def current_user(self) -> dict[str, Any]:
         """Return details of the user associated with the phabricator API token"""
         return self._make_request("user.whoami")["result"]
 
+    @cached
     def find_user_by_username(self, username: str) -> Optional[dict[str, Any]]:
         """Return user details of the user with the provided username"""
         user = self._make_request(
@@ -138,6 +142,7 @@ class PhabricatorClient:
         """Set the owner of the argument task to the argument user id"""
         return self.create_or_edit_task(task_id=task_id, params={"owner": user_phid})
 
+    @cached(ttl=timedelta(days=1))
     def list_project_columns(
         self,
         project_phid: str,
@@ -147,6 +152,7 @@ class PhabricatorClient:
             "project.column.search", params={"constraints[projects][0]": project_phid}
         )["result"]["data"]
 
+    @cached(ttl=timedelta(days=1))
     def get_project_current_milestone_phid(self, project_phid: str) -> Optional[str]:
         """Return the PHID of the current milestone associated with the given project.
 
@@ -172,6 +178,7 @@ class PhabricatorClient:
 
         return target_project_phid
 
+    @cached
     def find_column_in_project(self, project_phid: str, column_name: str) -> str:
         """Finds a column in a project.
 
