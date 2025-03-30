@@ -3,7 +3,6 @@ import json
 import os
 import sys
 import time
-
 from datetime import datetime
 from functools import wraps
 from pathlib import Path
@@ -57,7 +56,7 @@ def cached(*cached_args, **cached_kwargs):
         def wrapper(*args, **kwargs):
             # Check if the decorated function takes a `self` parameter, which is then omitted
             # from the cache key, as we just care about the other arguments, not the class itself.
-            if inspect.getcallargs(f, *args, **kwargs).get("self"):
+            if list(inspect.signature(f).parameters.keys())[0] == "self":
                 cache_args = args[1:]
             else:
                 cache_args = args
