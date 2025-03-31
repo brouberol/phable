@@ -191,7 +191,7 @@ def create_task(
 
     if parent_id:
         parent = client.show_task(parent_id)
-        task_params["parents.add"] = [parent["phid"]]
+        task_params["parents.set"] = [parent["phid"]]
 
     task = client.create_or_edit_task(task_params)
     ctx.invoke(show_task, task_id=task["result"]["object"]["id"])
