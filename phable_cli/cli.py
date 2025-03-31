@@ -135,17 +135,18 @@ def create_task(
 
     \b
     Examples:
+    \b
+    # Create a task with a long description by writing it in your favorite text editor
+    $ phable create --title 'A task'
+    \b
+    # Create a task with a long description by pointing it to a description file
+    $ phable create --title 'A task' --description path/to/description.txt
+    \b
     # Create a task with associated title, priority and desription
     $ phable create --title 'Do the thing!' --priority high --description 'Address the thing right now'
     \b
     # Create a task with a given parent
     $ phable create --title 'A subtask' --description 'Subtask description' --parent-id T123456
-    \b
-    # Create a task with a long description by pointing it to a description file
-    $ phable create --title 'A task' --description path/to/description.txt
-    \b
-    # Create a task with a long description by writing it in your favorite text editor
-    $ phable create --title 'A task'
     \b
     # Create a task with an associated top-level project tag
     $ phable create --title 'A task' --tags 'Data-Platform-SRE'
