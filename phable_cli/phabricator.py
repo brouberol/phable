@@ -92,7 +92,7 @@ class PhabricatorClient:
             "maniphest.search", params={"constraints[parentIDs][0]": parent_id}
         )["result"]["data"]
 
-    @cached("task_parent")
+    @cached
     def find_parent_task(self, subtask_id: int) -> Optional[dict[str, Any]]:
         """Return details of the parent Maniphest task for the provided task id"""
         return self._first(
