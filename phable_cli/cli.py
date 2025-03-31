@@ -120,14 +120,16 @@ def show_task(task_id: int, format: str = "plain"):
 )
 @click.option("--parent-id", type=Task.from_str, help="ID of parent task")
 @click.option("--tags", multiple=True, help="Tags to associate to the task")
+@click.option("--owner", help="The username of the task owner")
 @click.pass_context
 def create_task(
     ctx,
     title: str,
-    description: str,
+    description: Optional[str],
     priority: str,
     parent_id: Optional[str],
     tags: list[str],
+    owner: Optional[str],
 ):
     """Create a new task
 
@@ -150,6 +152,9 @@ def create_task(
     \b
     # Create a task with an associated sub-project tag
     $ phable create --title 'A task' --tags 'Data-Platform-SRE (2025.03.22 - 2025.04.11)
+    \b
+    # Create a task with an associated owner
+    $ phable create --title 'A task' --owner brouberol
 
     """
     client = PhabricatorClient()
@@ -188,6 +193,12 @@ def create_task(
 
     if tag_projects_phids:
         task_params["projects.add"] = tag_projects_phids
+
+    if owner:
+        if owner_user := client.find_user_by_username(username=owner):
+            task_params["owner"] = owner_user["phid"]
+        else:
+            ctx.fail(f"User {owner} not found")
 
     if parent_id:
         parent = client.show_task(parent_id)
