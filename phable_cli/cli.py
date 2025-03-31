@@ -1,5 +1,6 @@
 import atexit
 import json
+import re
 from typing import Optional
 
 import click
@@ -118,6 +119,7 @@ def show_task(task_id: int, format: str = "plain"):
     default="normal",
 )
 @click.option("--parent-id", type=Task.from_str, help="ID of parent task")
+@click.option("--tags", multiple=True, help="Tags to associate to the task")
 @click.pass_context
 def create_task(
     ctx,
@@ -125,6 +127,7 @@ def create_task(
     description: str,
     priority: str,
     parent_id: Optional[str],
+    tags: list[str],
 ):
     """Create a new task
 
@@ -141,6 +144,13 @@ def create_task(
     \b
     # Create a task with a long description by writing it in your favorite text editor
     $ phable create --title 'A task'
+    \b
+    # Create a task with an associated top-level project tag
+    $ phable create --title 'A task' --tags 'Data-Platform-SRE'
+    \b
+    # Create a task with an associated sub-project tag
+    $ phable create --title 'A task' --tags 'Data-Platform-SRE (2025.03.22 - 2025.04.11)
+
     """
     client = PhabricatorClient()
     description = text_from_cli_arg_or_fs_or_editor(description)
@@ -150,6 +160,35 @@ def create_task(
         "projects.add": [config.phabricator_default_project_phid],
         "priority": priority,
     }
+
+    tag_projects_phids = []
+    for tag in tags:
+        # The tag name can be a simple string, or "parent name (subproject name)"
+        # In the case of the latter, we need to fetch details for both projects
+        if match := re.match(
+            r"(?P<parent>[\w\s\.-]+) \((?P<subproject>[\w\s+\.-]+)\)", tag
+        ):
+            parent_title = match.group("parent").strip()
+            if parent_project := client.find_project_by_title(title=parent_title):
+                parent_project_phid = parent_project["phid"]
+            else:
+                ctx.fail(f"Project {parent_project} not found")
+            project_title = match.group("subproject").strip()
+            if project := client.find_project_by_title(
+                title=project_title, parent_phid=parent_project_phid
+            ):
+                tag_projects_phids.append(project["phid"])
+            else:
+                ctx.fail(f"Project {project_title} not found")
+        # Simple project name with no subproject
+        elif project := client.find_project_by_title(title=tag):
+            tag_projects_phids.append(project["phid"])
+        else:
+            ctx.fail(f"Project {tag} not found")
+
+    if tag_projects_phids:
+        task_params["projects.add"] = tag_projects_phids
+
     if parent_id:
         parent = client.show_task(parent_id)
         task_params["parents.add"] = [parent["phid"]]

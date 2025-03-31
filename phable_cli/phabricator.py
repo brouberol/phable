@@ -202,3 +202,16 @@ class PhabricatorClient:
                 f"Column {column_name} not found in milestone {project_phid}"
             )
         return column_phid
+
+    @cached
+    def find_project_by_title(
+        self, title: str, parent_phid: Optional[str] = None
+    ) -> Optional[dict[str, Any]]:
+        params = {"constraints[query]": f'title:"{title}"'}
+        if parent_phid:
+            params["constraints[parents][0]"] = parent_phid
+        else:
+            params["constraints[maxDepth]"] = "0"  # search for top-level project
+        return self._first(
+            self._make_request("project.search", params=params)["result"]["data"]
+        )
