@@ -25,14 +25,16 @@ Usage: phable [OPTIONS] COMMAND [ARGS]...
   Manage Phabricator tasks from the comfort of your terminal
 
 Options:
-  --help  Show this message and exit.
+  --version  Show the version and exit.
+  --help     Show this message and exit.
 
 Commands:
-  assign   Assign one or multiple task ids to a username
-  comment  Add a comment to a task
-  create   Create a new task
-  move     Move one or several task on their current project board
-  show     Show task details
+  assign     Assign one or multiple task ids to a username
+  comment    Add a comment to a task
+  create     Create a new task
+  move       Move one or several task on their current project board
+  show       Show task details
+  subscribe  Subscribe to one or multiple task ids
 ```
 
 ## Setup

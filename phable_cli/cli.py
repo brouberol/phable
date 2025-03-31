@@ -254,5 +254,25 @@ def comment_on_task(task_id: int, comment: Optional[str]):
     client.create_or_edit_task(task_id=task_id, params={"comment": comment})
 
 
+@cli.command(name="subscribe")
+@click.argument("task-ids", type=Task.from_str, nargs=VARIADIC)
+@click.pass_context
+def subscribe_to_task(ctx, task_ids: list[int]):
+    """Subscribe to one or multiple task ids
+
+    \b
+    Examples:
+    $ phable subscribe T123456
+    $ phable subscribe T123456 T234567
+
+    """
+    client = PhabricatorClient()
+    user = client.current_user()
+    if not user:
+        ctx.fail("Current user was not found")
+    for task_id in task_ids:
+        client.add_user_to_task_subscribers(task_id=task_id, user_phid=user["phid"])
+
+
 if __name__ == "__main__":
     cli()

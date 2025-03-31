@@ -109,6 +109,14 @@ class PhabricatorClient:
         """Set the status of the argument task to Resolved"""
         return self.create_or_edit_task(task_id=task_id, params={"status": "resolved"})
 
+    def add_user_to_task_subscribers(
+        self, task_id: int, user_phid: str
+    ) -> dict[str, Any]:
+        """Add the user to the list of the task subscribers"""
+        return self.create_or_edit_task(
+            task_id=task_id, params={"subscribers.add": [user_phid]}
+        )
+
     @cached
     def show_user(self, phid: str) -> Optional[dict[str, Any]]:
         """Show details of a Maniphest user"""
