@@ -267,7 +267,6 @@ def move_task(
     $ phable move T123456 T234567 --column 'Done'
 
     """
-
     try:
         client = PhabricatorClient()
         target_project_phid = client.get_main_project_or_milestone(
@@ -298,6 +297,7 @@ def comment_on_task(task_id: int, comment: Optional[str]):
     $ phable comment T123456 --comment 'hello'              # set comment body from the cli itself
     $ phable comment T123456 --comment path/to/comment.txt  # set comment body from a text file
     $ phable comment T123456                                # set comment body from your own text editor
+
     """
     client = PhabricatorClient()
     comment = text_from_cli_arg_or_fs_or_editor(comment)
