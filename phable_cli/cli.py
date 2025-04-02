@@ -349,5 +349,9 @@ def subscribe_to_task(ctx, task_ids: list[int]):
         client.add_user_to_task_subscribers(task_id=task_id, user_phid=user["phid"])
 
 
+def runcli():
+    cli(max_content_width=120)
+
+
 if __name__ == "__main__":
-    cli()
+    runcli()
