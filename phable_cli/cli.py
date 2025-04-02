@@ -1,8 +1,8 @@
 import atexit
 import json
 import re
-from typing import Optional
 from pathlib import Path
+from typing import Optional
 
 import click
 from click import Context
@@ -42,7 +42,7 @@ class Task(int):
     default="plain",
     help="Output format",
 )
-@click.argument("task-id", type=Task.from_str)
+@click.argument("task-id", type=Task.from_str, required=True)
 def show_task(task_id: int, format: str = "plain"):
     """Show task details
 
@@ -239,7 +239,7 @@ def create_task(
     required=False,
     help="The username to assign the task to. Self-assign the task if not provided.",
 )
-@click.argument("task-ids", type=Task.from_str, nargs=VARIADIC)
+@click.argument("task-ids", type=Task.from_str, nargs=VARIADIC, required=True)
 @click.pass_context
 def assign_task(ctx, task_ids: list[int], username: Optional[str]):
     """Assign one or multiple task ids to a username
@@ -276,7 +276,7 @@ def assign_task(ctx, task_ids: list[int], username: Optional[str]):
         "milestone board, instead of the project board itself"
     ),
 )
-@click.argument("task-ids", type=Task.from_str, nargs=VARIADIC)
+@click.argument("task-ids", type=Task.from_str, nargs=VARIADIC, required=True)
 @click.pass_context
 def move_task(
     ctx: Context, task_ids: list[int], column: Optional[str], milestone: bool
@@ -330,7 +330,7 @@ def comment_on_task(task_id: int, comment: Optional[str]):
 
 
 @cli.command(name="subscribe")
-@click.argument("task-ids", type=Task.from_str, nargs=VARIADIC)
+@click.argument("task-ids", type=Task.from_str, nargs=VARIADIC, required=True)
 @click.pass_context
 def subscribe_to_task(ctx, task_ids: list[int]):
     """Subscribe to one or multiple task ids
