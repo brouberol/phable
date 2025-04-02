@@ -129,6 +129,7 @@ def show_task(task_id: int, format: str = "plain"):
 )
 @click.option("--parent-id", type=Task.from_str, help="ID of parent task")
 @click.option("--tags", multiple=True, help="Tags to associate to the task")
+@click.option("--cc", multiple=True, help="Subscribers to associate to the task")
 @click.option("--owner", help="The username of the task owner")
 @click.pass_context
 def create_task(
@@ -139,6 +140,7 @@ def create_task(
     priority: str,
     parent_id: Optional[str],
     tags: list[str],
+    cc: list[str],
     owner: Optional[str],
 ):
     """Create a new task
@@ -169,6 +171,9 @@ def create_task(
     \b
     # Create a task with an associated owner
     $ phable create --title 'A task' --owner brouberol
+    \b
+    # Create a task with an associated subscriber
+    $ phable create --title 'A task' --cc brouberol
 
     """
     client = PhabricatorClient()
@@ -215,7 +220,6 @@ def create_task(
             tag_projects_phids.append(project["phid"])
         else:
             ctx.fail(f"Project {tag} not found")
-
     if tag_projects_phids:
         task_params["projects.add"] = tag_projects_phids
 
@@ -228,6 +232,15 @@ def create_task(
     if parent_id:
         parent = client.show_task(parent_id)
         task_params["parents.set"] = [parent["phid"]]
+
+    cc_phids = []
+    for username in cc:
+        if user := client.find_user_by_username(username=username):
+            cc_phids.appedn(user["phid"])
+        else:
+            ctx.fail(f"User {owner} not found")
+    if cc_phids:
+        task_params["subscribers.set"] = cc_phids
 
     task = client.create_or_edit_task(task_params)
     ctx.invoke(show_task, task_id=task["result"]["object"]["id"])
