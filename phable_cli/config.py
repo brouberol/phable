@@ -1,15 +1,16 @@
 import os
-import sys
 from dataclasses import dataclass, field
 from functools import partial
+
+import click
+
+_warnings = []
 
 
 def os_getenv_or_raise(env_var_name: str):
     if val := os.getenv(env_var_name):
         return val
-    sys.stderr.write(f"{env_var_name} is not set and is required\n")
-    sys.stderr.flush()
-    sys.exit(1)
+    _warnings.append(f"Required environment variable {env_var_name} is not set")
 
 
 def field_with_default_from_env(env_var_name):
@@ -23,6 +24,11 @@ class Config:
     phabricator_default_project_phid: str = field_with_default_from_env(
         "PHABRICATOR_DEFAULT_PROJECT_PHID"
     )
+
+    def __post_init__(self):
+        for warn in _warnings:
+            click.echo(click.style(warn, fg="yellow"), err=True)
+        return len(_warnings) == 0
 
 
 config = Config()
