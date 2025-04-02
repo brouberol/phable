@@ -2,6 +2,7 @@ import atexit
 import json
 import re
 from typing import Optional
+from pathlib import Path
 
 import click
 from click import Context
@@ -113,6 +114,14 @@ def show_task(task_id: int, format: str = "plain"):
     help="Task description or path to a file containing the description body. If not provided, an editor will be opened.",
 )
 @click.option(
+    "--template",
+    type=Path,
+    help=(
+        "Task description template file. If provided, the --description flag will be ignored "
+        "and an editor will be opened, pre-filled with the template file content"
+    ),
+)
+@click.option(
     "--priority",
     type=click.Choice(["unbreaknow", "high", "normal", "low", "needs-triage"]),
     help="Priority level of the task",
@@ -126,6 +135,7 @@ def create_task(
     ctx,
     title: str,
     description: Optional[str],
+    template: Path,
     priority: str,
     parent_id: Optional[str],
     tags: list[str],
@@ -145,6 +155,9 @@ def create_task(
     # Create a task with associated title, priority and desription
     $ phable create --title 'Do the thing!' --priority high --description 'Address the thing right now'
     \b
+    # Create a task with associated description template
+    $ phable create --title 'Do the thing!' --template ./template.md
+    \b
     # Create a task with a given parent
     $ phable create --title 'A subtask' --description 'Subtask description' --parent-id T123456
     \b
@@ -159,7 +172,18 @@ def create_task(
 
     """
     client = PhabricatorClient()
-    description = text_from_cli_arg_or_fs_or_editor(description)
+    if template:
+        if template.exists():
+            description = template
+            force_editor = True
+        else:
+            ctx.fail(f"Template file {template} does not exist")
+    else:
+        force_editor = False
+    description = text_from_cli_arg_or_fs_or_editor(
+        description, force_editor=force_editor
+    )
+
     task_params = {
         "title": title,
         "description": description,
