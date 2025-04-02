@@ -192,12 +192,11 @@ def create_task(
     task_params = {
         "title": title,
         "description": description,
-        "projects.add": [config.phabricator_default_project_phid],
         "priority": priority,
     }
 
     tag_projects_phids = []
-    for tag in tags:
+    for tag in tags or [config.phabricator_default_project_phid]:
         # The tag name can be a simple string, or "parent name (subproject name)"
         # In the case of the latter, we need to fetch details for both projects
         if match := re.match(
