@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "phable-cli"
-version = "0.1.3"
+version = "0.1.4"
 description = "Manage Phabricator tasks from the comfort of your terminal"
 authors = ["Balthazar Rouberol <br@imap.cc>"]
 license = "MIT"
