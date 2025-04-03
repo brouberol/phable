@@ -237,7 +237,7 @@ def create_task(
     cc_phids = []
     for username in cc:
         if user := client.find_user_by_username(username=username):
-            cc_phids.appedn(user["phid"])
+            cc_phids.append(user["phid"])
         else:
             ctx.fail(f"User {owner} not found")
     if cc_phids:
