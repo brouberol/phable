@@ -196,7 +196,7 @@ def create_task(
     }
 
     tag_projects_phids = []
-    for tag in tags or [config.phabricator_default_project_phid]:
+    for tag in tags:
         # The tag name can be a simple string, or "parent name (subproject name)"
         # In the case of the latter, we need to fetch details for both projects
         if match := re.match(
@@ -221,6 +221,8 @@ def create_task(
             ctx.fail(f"Project {tag} not found")
     if tag_projects_phids:
         task_params["projects.add"] = tag_projects_phids
+    else:
+        task_params["projects.add"] = [config.phabricator_default_project_phid]
 
     if owner:
         if owner_user := client.find_user_by_username(username=owner):
