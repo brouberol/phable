@@ -59,56 +59,10 @@ def show_task(task_id: int, format: str = "plain"):
     """
     client = PhabricatorClient()
     if task := client.show_task(task_id):
-        enrich_task(client, task)
+        client.enrich_task(task)
         echo_task(click.echo, format, task)
     else:
         click.echo(f"Task {Task.from_int(task_id)} not found")
-
-
-def enrich_task(client:PhabricatorClient, task: dict[str, Any]) -> dict[str, Any]:
-    """Load additional data about a task.
-
-    The given task is enriched AND returned.
-
-    Some of the additional info that is loaded:
-    * projects
-    * subtasks
-    * parent tasks
-    """
-    task['url'] = f"{client.base_url}/{Task.from_int(task['id'])}"
-
-    task["author"] = client.show_user(phid=task["fields"]["authorPHID"])
-    if owner_id := task["fields"]["ownerPHID"]:
-        owner = client.show_user(phid=owner_id)["fields"]["username"]
-    else:
-        owner = "Unassigned"
-    task["owner"] = owner
-    if project_ids := task["attachments"]["projects"]["projectPHIDs"]:
-        tags = [
-            (
-                f"{project['fields']['parent']['name']} - {project['fields']['name']}"
-                if project["fields"]["parent"]
-                else project["fields"]["name"]
-            )
-            for project in client.show_projects(phids=project_ids)
-        ]
-    else:
-        tags = []
-    task["tags"] = tags
-    subtasks = client.find_subtasks(parent_id=task['id'])
-    if not subtasks:
-        subtasks = []
-    for subtask in subtasks:
-        if subtask_owner_id := subtask["fields"]["ownerPHID"]:
-            owner = client.show_user(subtask_owner_id)["fields"]["username"]
-        else:
-            owner = ""
-        subtask['owner'] = owner
-
-    task["subtasks"] = subtasks
-    parent = client.find_parent_task(subtask_id=task['id'])
-    task["parent"] = parent
-    return task
 
 
 def echo_task(echo: Callable[[str], None], format: str, task: dict[str, Any]) -> None:

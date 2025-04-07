@@ -8,6 +8,16 @@ from .config import config
 T = TypeVar("T")
 
 
+class Task(int):
+    @classmethod
+    def from_str(cls, value: str) -> int:
+        return int(value.lstrip("T"))
+
+    @classmethod
+    def from_int(cls, value: int) -> str:
+        return f"T{value}"
+
+
 class PhabricatorClient:
     """Phabricator API HTTP client.
 
@@ -85,6 +95,51 @@ class PhabricatorClient:
                 "attachments[columns]": "true",
             },
         )["result"]["data"][0]
+
+    def enrich_task(self, task: dict[str, Any]) -> dict[str, Any]:
+        """Load additional data about a task.
+
+        The given task is enriched AND returned.
+
+        Some of the additional info that is loaded:
+        * projects
+        * subtasks
+        * parent tasks
+        """
+        task['url'] = f"{self.base_url}/{Task.from_int(task['id'])}"
+
+        task["author"] = self.show_user(phid=task["fields"]["authorPHID"])
+        if owner_id := task["fields"]["ownerPHID"]:
+            owner = self.show_user(phid=owner_id)["fields"]["username"]
+        else:
+            owner = "Unassigned"
+        task["owner"] = owner
+        if project_ids := task["attachments"]["projects"]["projectPHIDs"]:
+            tags = [
+                (
+                    f"{project['fields']['parent']['name']} - {project['fields']['name']}"
+                    if project["fields"]["parent"]
+                    else project["fields"]["name"]
+                )
+                for project in self.show_projects(phids=project_ids)
+            ]
+        else:
+            tags = []
+        task["tags"] = tags
+        subtasks = self.find_subtasks(parent_id=task['id'])
+        if not subtasks:
+            subtasks = []
+        for subtask in subtasks:
+            if subtask_owner_id := subtask["fields"]["ownerPHID"]:
+                owner = self.show_user(subtask_owner_id)["fields"]["username"]
+            else:
+                owner = ""
+            subtask['owner'] = owner
+
+        task["subtasks"] = subtasks
+        parent = self.find_parent_task(subtask_id=task['id'])
+        task["parent"] = parent
+        return task
 
     def find_subtasks(self, parent_id: int) -> list[dict[str, Any]]:
         """Return details of all Maniphest subtasks of the provided task id"""
