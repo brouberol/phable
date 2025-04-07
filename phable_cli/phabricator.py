@@ -163,6 +163,17 @@ class PhabricatorClient:
         parent = self.find_parent_task(subtask_id=task['id'])
         task["parent"] = parent
 
+    def find_tasks_in_column(self, column_phid: str) -> list[dict[str, Any]]:
+        return self._make_request(
+            "maniphest.search",
+            params={
+                "constraints[columnPHIDs][0]": column_phid,
+                "attachments[subscribers]": "true",
+                "attachments[projects]": "true",
+                "attachments[columns]": "true",
+            }
+        )["result"]["data"]
+
     def find_subtasks(self, parent_id: int) -> list[dict[str, Any]]:
         """Return details of all Maniphest subtasks of the provided task id"""
         return self._make_request(
