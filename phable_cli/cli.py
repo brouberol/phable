@@ -25,6 +25,11 @@ def cli():
     pass
 
 
+@cli.group(name="cache")
+def _cache():
+    """Manage internal cache"""
+
+
 class Task(int):
     @classmethod
     def from_str(cls, value: str) -> int:
@@ -361,6 +366,19 @@ def subscribe_to_task(ctx, task_ids: list[int]):
         ctx.fail("Current user was not found")
     for task_id in task_ids:
         client.add_user_to_task_subscribers(task_id=task_id, user_phid=user["phid"])
+
+
+@_cache.command()
+def show():
+    """Display the location of the internal phable cache"""
+    click.echo(cache.cache_filepath)
+
+
+@_cache.command()
+def clear():
+    """Delete the phable internal cache file"""
+    cache.cache_filepath.unlink(missing_ok=True)
+    atexit.unregister(cache.dump)  # avoid re-dumping the in-memory cache back to disk
 
 
 def runcli():
