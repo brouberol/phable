@@ -59,7 +59,7 @@ def show_task(task_id: int, format: str = "plain"):
     """
     client = PhabricatorClient()
     if task := client.show_task(task_id):
-        client.enrich_task(task)
+        client.enrich_task(task, with_author_owner=True, with_tags=True, with_subtasks=True, with_parent=True)
         echo_task(click.echo, format, task)
     else:
         click.echo(f"Task {Task.from_int(task_id)} not found")
