@@ -320,7 +320,7 @@ def move_task(
 
         for task_id in task_ids:
             client.move_task_to_column(task_id=task_id, column_phid=target_column_phid)
-            if column.lower() == "in progress":
+            if column.lower() in ("in progress", "needs review"):
                 client.mark_task_as_in_progress(task_id)
             if column.lower() == "done":
                 client.mark_task_as_resolved(task_id)
