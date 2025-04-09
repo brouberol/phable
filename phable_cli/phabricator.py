@@ -109,6 +109,10 @@ class PhabricatorClient:
         """Set the status of the argument task to Resolved"""
         return self.create_or_edit_task(task_id=task_id, params={"status": "resolved"})
 
+    def mark_task_as_in_progress(self, task_id: int) -> dict[str, Any]:
+        """Set the status of the argument task to in progress"""
+        return self.create_or_edit_task(task_id=task_id, params={"status": "progress"})
+
     def add_user_to_task_subscribers(
         self, task_id: int, user_phid: str
     ) -> dict[str, Any]:
