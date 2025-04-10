@@ -97,12 +97,12 @@ class PhabricatorClient:
         )["result"]["data"][0]
 
     def enrich_task(
-            self,
-            task: dict[str, Any],
-            with_author_owner: bool = False,
-            with_tags: bool = False,
-            with_subtasks: bool = False,
-            with_parent: bool = False,
+        self,
+        task: dict[str, Any],
+        with_author_owner: bool = False,
+        with_tags: bool = False,
+        with_subtasks: bool = False,
+        with_parent: bool = False,
     ) -> dict[str, Any]:
         """Load additional data about a task.
 
@@ -113,7 +113,7 @@ class PhabricatorClient:
         * subtasks
         * parent tasks
         """
-        task['url'] = f"{self.base_url}/{Task.from_int(task['id'])}"
+        task["url"] = f"{self.base_url}/{Task.from_int(task['id'])}"
 
         if with_author_owner:
             self.enrich_task_with_author_owner(task)
@@ -148,7 +148,7 @@ class PhabricatorClient:
         task["tags"] = tags
 
     def enrich_task_with_subtasks(self, task: dict[str, Any]) -> None:
-        subtasks = self.find_subtasks(parent_id=task['id'])
+        subtasks = self.find_subtasks(parent_id=task["id"])
         if not subtasks:
             subtasks = []
         for subtask in subtasks:
@@ -156,11 +156,11 @@ class PhabricatorClient:
                 owner = self.show_user(subtask_owner_id)["fields"]["username"]
             else:
                 owner = ""
-            subtask['owner'] = owner
+            subtask["owner"] = owner
         task["subtasks"] = subtasks
 
     def enrich_task_with_parent(self, task: dict[str, Any]) -> None:
-        parent = self.find_parent_task(subtask_id=task['id'])
+        parent = self.find_parent_task(subtask_id=task["id"])
         task["parent"] = parent
 
     def find_tasks_in_column(self, column_phid: str) -> list[dict[str, Any]]:
@@ -171,7 +171,7 @@ class PhabricatorClient:
                 "attachments[subscribers]": "true",
                 "attachments[projects]": "true",
                 "attachments[columns]": "true",
-            }
+            },
         )["result"]["data"]
 
     def find_subtasks(self, parent_id: int) -> list[dict[str, Any]]:
