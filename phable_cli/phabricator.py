@@ -274,9 +274,18 @@ class PhabricatorClient:
         )
 
         if not target_project_phid:
-            raise ValueError(f"Could not find a milestone in {project_phid}")
+            project = self.format_project_name(project_phid=project_phid)
+            raise ValueError(f"Could not find a milestone in {project}")
 
         return target_project_phid
+
+    def format_project_name(self, project_phid: str) -> str:
+        project = self.show_projects(phids=[project_phid])[0]
+        if project["fields"].get("parent"):
+            parent_project_name = project["fields"]["parent"]["name"]
+            return f"{parent_project_name} ({project['fields']['name']})"
+        else:
+            return project["fields"]["name"]
 
     @cached
     def find_column_in_project(self, project_phid: str, column_name: str) -> str:
@@ -290,8 +299,9 @@ class PhabricatorClient:
                 column_phid = col["phid"]
                 break
         else:
+            project_name = self.format_project_name(project_phid=project_phid)
             raise ValueError(
-                f"Column {column_name} not found in milestone {project_phid}"
+                f"Column {column_name} not found in milestone {project_name}"
             )
         return column_phid
 
