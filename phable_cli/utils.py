@@ -4,7 +4,9 @@ import os
 from pathlib import Path
 
 
-def text_from_cli_arg_or_fs_or_editor(body_or_path: str, force_editor: bool) -> str:
+def text_from_cli_arg_or_fs_or_editor(
+    body_or_path: str, force_editor: bool = False
+) -> str:
     """Return argument text/file content, or return prompted input text.
 
     If some argument text is passed, and it matches a file path, return the file content.
