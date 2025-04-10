@@ -23,7 +23,10 @@ class Cache:
             self.cache_dir.mkdir()
         self.cache_filepath = self.cache_dir / "cache.json"
         if self.cache_filepath.exists():
-            self.data = json.load(open(self.cache_filepath))
+            try:
+                self.data = json.load(open(self.cache_filepath))
+            except json.JSONDecodeError:
+                self.data = {}
         else:
             self.data = {}
 
