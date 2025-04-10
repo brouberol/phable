@@ -8,6 +8,16 @@ from .config import config
 T = TypeVar("T")
 
 
+class Task(int):
+    @classmethod
+    def from_str(cls, value: str) -> int:
+        return int(value.lstrip("T"))
+
+    @classmethod
+    def from_int(cls, value: int) -> str:
+        return f"T{value}"
+
+
 class PhabricatorClient:
     """Phabricator API HTTP client.
 
@@ -85,6 +95,84 @@ class PhabricatorClient:
                 "attachments[columns]": "true",
             },
         )["result"]["data"][0]
+
+    def enrich_task(
+            self,
+            task: dict[str, Any],
+            with_author_owner: bool = False,
+            with_tags: bool = False,
+            with_subtasks: bool = False,
+            with_parent: bool = False,
+    ) -> dict[str, Any]:
+        """Load additional data about a task.
+
+        The given task is enriched AND returned.
+
+        Some of the additional info that is loaded:
+        * projects
+        * subtasks
+        * parent tasks
+        """
+        task['url'] = f"{self.base_url}/{Task.from_int(task['id'])}"
+
+        if with_author_owner:
+            self.enrich_task_with_author_owner(task)
+        if with_tags:
+            self.enrich_task_with_tags(task)
+        if with_subtasks:
+            self.enrich_task_with_subtasks(task)
+        if with_parent:
+            self.enrich_task_with_parent(task)
+        return task
+
+    def enrich_task_with_author_owner(self, task: dict[str, Any]) -> None:
+        task["author"] = self.show_user(phid=task["fields"]["authorPHID"])
+        if owner_id := task["fields"]["ownerPHID"]:
+            owner = self.show_user(phid=owner_id)["fields"]["username"]
+        else:
+            owner = "Unassigned"
+        task["owner"] = owner
+
+    def enrich_task_with_tags(self, task: dict[str, Any]) -> None:
+        if project_ids := task["attachments"]["projects"]["projectPHIDs"]:
+            tags = [
+                (
+                    f"{project['fields']['parent']['name']} - {project['fields']['name']}"
+                    if project["fields"]["parent"]
+                    else project["fields"]["name"]
+                )
+                for project in self.show_projects(phids=project_ids)
+            ]
+        else:
+            tags = []
+        task["tags"] = tags
+
+    def enrich_task_with_subtasks(self, task: dict[str, Any]) -> None:
+        subtasks = self.find_subtasks(parent_id=task['id'])
+        if not subtasks:
+            subtasks = []
+        for subtask in subtasks:
+            if subtask_owner_id := subtask["fields"]["ownerPHID"]:
+                owner = self.show_user(subtask_owner_id)["fields"]["username"]
+            else:
+                owner = ""
+            subtask['owner'] = owner
+        task["subtasks"] = subtasks
+
+    def enrich_task_with_parent(self, task: dict[str, Any]) -> None:
+        parent = self.find_parent_task(subtask_id=task['id'])
+        task["parent"] = parent
+
+    def find_tasks_in_column(self, column_phid: str) -> list[dict[str, Any]]:
+        return self._make_request(
+            "maniphest.search",
+            params={
+                "constraints[columnPHIDs][0]": column_phid,
+                "attachments[subscribers]": "true",
+                "attachments[projects]": "true",
+                "attachments[columns]": "true",
+            }
+        )["result"]["data"]
 
     def find_subtasks(self, parent_id: int) -> list[dict[str, Any]]:
         """Return details of all Maniphest subtasks of the provided task id"""

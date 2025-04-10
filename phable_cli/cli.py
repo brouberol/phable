@@ -2,7 +2,7 @@ import atexit
 import json
 import re
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Any, Callable
 
 import click
 from click import Context
@@ -59,57 +59,48 @@ def show_task(task_id: int, format: str = "plain"):
     """
     client = PhabricatorClient()
     if task := client.show_task(task_id):
-        author = client.show_user(phid=task["fields"]["authorPHID"])
-        if owner_id := task["fields"]["ownerPHID"]:
-            owner = client.show_user(phid=owner_id)["fields"]["username"]
-        else:
-            owner = "Unassigned"
-        if project_ids := task["attachments"]["projects"]["projectPHIDs"]:
-            tags = [
-                (
-                    f"{project['fields']['parent']['name']} - {project['fields']['name']}"
-                    if project["fields"]["parent"]
-                    else project["fields"]["name"]
-                )
-                for project in client.show_projects(phids=project_ids)
-            ]
-        else:
-            tags = []
-        subtasks = client.find_subtasks(parent_id=task_id)
-        task["subtasks"] = subtasks
-        parent = client.find_parent_task(subtask_id=task_id)
-        task["parent"] = parent
-        if format == "json":
-            click.echo(json.dumps(task))
-        else:
-            parent_str = (
-                f"{Task.from_int(parent['id'])} - {parent['fields']['name']}"
-                if parent
-                else ""
-            )
-            click.echo(f"URL: {client.base_url}/{Task.from_int(task_id)}")
-            click.echo(f"Task: {Task.from_int(task_id)}")
-            click.echo(f"Title: {task['fields']['name']}")
-            click.echo(f"Author: {author['fields']['username']}")
-            click.echo(f"Owner: {owner}")
-            click.echo(f"Tags: {', '.join(tags)}")
-            click.echo(f"Status: {task['fields']['status']['name']}")
-            click.echo(f"Priority: {task['fields']['priority']['name']}")
-            click.echo(f"Description: {task['fields']['description']['raw']}")
-            click.echo(f"Parent: {parent_str}")
-            click.echo("Subtasks:")
-            if subtasks:
-                for subtask in subtasks:
-                    status = f"{'[x]' if subtask['fields']['status']['value'] == 'resolved' else '[ ]'}"
-                    if subtask_owner_id := subtask["fields"]["ownerPHID"]:
-                        owner = client.show_user(subtask_owner_id)["fields"]["username"]
-                    else:
-                        owner = ""
-                    click.echo(
-                        f"{status} - {Task.from_int(subtask['id'])} - @{owner:<10} - {subtask['fields']['name']}"
-                    )
+        task = client.enrich_task(task, with_author_owner=True, with_tags=True, with_subtasks=True, with_parent=True)
+        echo_task(click.echo, format, task)
     else:
         click.echo(f"Task {Task.from_int(task_id)} not found")
+
+
+def echo_task(echo: Callable[[str], None], format: str, task: dict[str, Any]) -> None:
+    """Print a task.
+
+    Print a task in a text or json format. The task needs to be enriched first.
+
+    To generalize the implementation and not couple it to the click library,
+    the user must pass an `echo` function that will be used to print the task.
+    """
+    if format == "json":
+        echo(json.dumps(task))
+    else:
+        parent_str = (
+            f"{Task.from_int(task["parent"]['id'])} - {task["parent"]['fields']['name']}"
+            if task.get("parent")
+            else ""
+        )
+        echo(f"URL: {task['url']}")
+        echo(f"Task: {Task.from_int(task['id'])}")
+        echo(f"Title: {task['fields']['name']}")
+        if task.get("author"):
+            echo(f"Author: {task['author']['fields']['username']}")
+        if task.get("owner"):
+            echo(f"Owner: {task['owner']}")
+        if task.get("tags"):
+            echo(f"Tags: {', '.join(task['tags'])}")
+        echo(f"Status: {task['fields']['status']['name']}")
+        echo(f"Priority: {task['fields']['priority']['name']}")
+        echo(f"Description: {task['fields']['description']['raw']}")
+        echo(f"Parent: {parent_str}")
+        echo("Subtasks:")
+        if task.get("subtasks"):
+            for subtask in task["subtasks"]:
+                status = f"{'[x]' if subtask['fields']['status']['value'] == 'resolved' else '[ ]'}"
+                echo(
+                    f"{status} - {Task.from_int(subtask['id'])} - @{subtask['owner']:<10} - {subtask['fields']['name']}"
+                )
 
 
 @cli.command(name="create")
@@ -381,6 +372,51 @@ def clear():
     """Delete the phable internal cache file"""
     cache.cache_filepath.unlink(missing_ok=True)
     atexit.unregister(cache.dump)  # avoid re-dumping the in-memory cache back to disk
+
+@cli.command(name="report-done-tasks")
+@click.option(
+    "--milestone/--no-milestone",
+    default=False,
+    help=(
+            "If --milestone is passed, the task will be moved onto the current project's associated "
+            "milestone board, instead of the project board itself"
+    ),
+)
+@click.option(
+    "--format",
+    type=click.Choice(("plain", "json")),
+    default="plain",
+    help="Output format",
+)
+@click.option(
+    "--source",
+    type=str,
+    default="Done",
+    help="",
+)
+@click.option(
+    "--destination",
+    type=str,
+    default="Reported",
+    help="",
+)
+def report_done_tasks(milestone: bool, format:str, source: str, destination: str):
+    """Print the details of all tasks in the `from` column and move them to the `to` column.
+
+    This is used to produce the weekly reports, and document the tasks as reported once the report is done."""
+    client = PhabricatorClient()
+    target_project_phid = client.get_main_project_or_milestone(
+        milestone, config.phabricator_default_project_phid
+    )
+    column_source_phid = client.find_column_in_project(target_project_phid, source)
+    column_destination_phid = client.find_column_in_project(target_project_phid, destination)
+    tasks = client.find_tasks_in_column(column_source_phid)
+    for task in tasks:
+        task = client.enrich_task(task)
+        if format == "plain":
+            click.echo("="*50)
+        echo_task(click.echo, format, task)
+        client.move_task_to_column(task['id'], column_destination_phid)
 
 
 def runcli():
