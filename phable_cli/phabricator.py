@@ -1,9 +1,9 @@
-from typing import Any, Optional, TypeVar
 from datetime import timedelta
+from typing import Any, Optional, TypeVar
+
 import requests
 
 from .cache import cached
-from .config import config
 
 T = TypeVar("T")
 
@@ -25,9 +25,9 @@ class PhabricatorClient:
 
     """
 
-    def __init__(self):
-        self.base_url = config.phabricator_url.rstrip("/")
-        self.token = config.phabricator_token
+    def __init__(self, base_url, token):
+        self.base_url = base_url.rstrip("/")
+        self.token = token
         self.session = requests.Session()
         self.timeout = 5
 

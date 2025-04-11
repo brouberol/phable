@@ -10,9 +10,14 @@ readme = "README.md"
 python = "^3.9"
 requests = "^2.32.3"
 click = "^8.1.8"
+pytest = "^8.3.5"
 
 [tool.poetry.scripts]
 phable = 'phable_cli.cli:runcli'
+
+[tool.poetry.group.dev.dependencies]
+responses = "^0.25.7"
+pytest = "^8.3.5"
 
 [build-system]
 requires = ["poetry-core"]
