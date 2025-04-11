@@ -9,7 +9,7 @@ from pathlib import Path
 
 CACHE_HOME_PER_PLATFORM = {
     "darwin": Path.home() / "Library" / "Caches",
-    "linux": Path(os.getenv("XDG_CACHE_HOME", f"{Path.home()}/.config")),
+    "linux": Path(os.getenv("XDG_CACHE_HOME", f"{Path.home()}/.cache")),
     "windows": Path("c:/", "Users", os.getlogin(), "AppData", "Local", "Temp"),
 }
 
