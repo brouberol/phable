@@ -136,7 +136,7 @@ def echo_task(echo: Callable[[str], None], format: str, task: dict[str, Any]) ->
         echo(json.dumps(task))
     else:
         parent_str = (
-            f"{Task.from_int(task["parent"]['id'])} - {task["parent"]['fields']['name']}"
+            f"{Task.from_int(task['parent']['id'])} - {task['parent']['fields']['name']}"
             if task.get("parent")
             else ""
         )
