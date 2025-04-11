@@ -57,7 +57,7 @@ def show_task(task_id: int, format: str = "plain"):
     $ phable show T123456  --format=json  # show task details as json
 
     """
-    client = PhabricatorClient()
+    client = PhabricatorClient(config.phabricator_url, config.phabricator_token)
     if task := client.show_task(task_id):
         task = client.enrich_task(
             task,
@@ -178,7 +178,7 @@ def create_task(
     $ phable create --title 'A task' --cc brouberol
 
     """
-    client = PhabricatorClient()
+    client = PhabricatorClient(config.phabricator_url, config.phabricator_token)
     if template:
         if template.exists():
             description = template
@@ -266,7 +266,7 @@ def assign_task(ctx, task_ids: list[int], username: Optional[str]):
     $ phable assign T123456  brouberol  # asign to username
 
     """
-    client = PhabricatorClient()
+    client = PhabricatorClient(config.phabricator_url, config.phabricator_token)
     if not username:
         user = client.current_user()
     else:
@@ -309,7 +309,7 @@ def move_task(
 
     """
     try:
-        client = PhabricatorClient()
+        client = PhabricatorClient(config.phabricator_url, config.phabricator_token)
         target_project_phid = client.get_main_project_or_milestone(
             milestone, config.phabricator_default_project_phid
         )
@@ -342,7 +342,7 @@ def comment_on_task(task_id: int, comment: Optional[str]):
     $ phable comment T123456                                # set comment body from your own text editor
 
     """
-    client = PhabricatorClient()
+    client = PhabricatorClient(config.phabricator_url, config.phabricator_token)
     comment = text_from_cli_arg_or_fs_or_editor(comment)
     client.create_or_edit_task(task_id=task_id, params={"comment": comment})
 
@@ -359,7 +359,7 @@ def subscribe_to_task(ctx, task_ids: list[int]):
     $ phable subscribe T123456 T234567
 
     """
-    client = PhabricatorClient()
+    client = PhabricatorClient(config.phabricator_url, config.phabricator_token)
     user = client.current_user()
     if not user:
         ctx.fail("Current user was not found")
@@ -412,7 +412,7 @@ def report_done_tasks(milestone: bool, format: str, source: str, destination: st
 
     This is used to produce the weekly reports, and document the tasks as reported once the report is done.
     """
-    client = PhabricatorClient()
+    client = PhabricatorClient(config.phabricator_url, config.phabricator_token)
     target_project_phid = client.get_main_project_or_milestone(
         milestone, config.phabricator_default_project_phid
     )
