@@ -2,23 +2,30 @@ import inspect
 import json
 import os
 import sys
+import tempfile
 import time
 from datetime import datetime
 from functools import wraps
 from pathlib import Path
 
-CACHE_HOME_PER_PLATFORM = {
-    "darwin": Path.home() / "Library" / "Caches",
-    "linux": Path(os.getenv("XDG_CACHE_HOME", f"{Path.home()}/.cache")),
-    "windows": Path("c:/", "Users", os.getlogin(), "AppData", "Local", "Temp"),
-}
+if not os.getenv("GITHUB_ACTIONS"):
+    CACHE_HOME_PER_PLATFORM = {
+        "darwin": Path.home() / "Library" / "Caches",
+        "linux": Path(os.getenv("XDG_CACHE_HOME", f"{Path.home()}/.config")),
+        "windows": Path("c:/", "Users", os.getlogin(), "AppData", "Local", "Temp"),
+    }
+else:
+    CACHE_HOME_PER_PLATFORM = {}
 
 
 class Cache:
     """A persistent cache for long-lived data, such as user or project"""
 
     def __init__(self):
-        self.cache_dir = CACHE_HOME_PER_PLATFORM[sys.platform] / "phind"
+        cache_parent_dir = CACHE_HOME_PER_PLATFORM.get(sys.platform) or Path(
+            tempfile.mkdtemp()
+        )
+        self.cache_dir = cache_parent_dir / "phind"
         if not self.cache_dir.exists():
             self.cache_dir.mkdir()
         self.cache_filepath = self.cache_dir / "cache.json"
