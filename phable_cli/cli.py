@@ -18,7 +18,55 @@ VARIADIC = -1  # Used for click variadic arguments
 atexit.register(cache.dump)
 
 
-@click.group()
+class AliasedCommandGroup(click.Group):
+    """Custom CLI group allowing the replaement of aliases commands on the fly
+
+    For example if we have the following configuraion:
+    [aliases]
+    done = move --column 'Done' --milestone
+
+    then calling `phable done T123456` will actually call
+    `phable move --column Done --milestone T123456` under the hood.
+
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._aliases = config.data.get("aliases", {})
+
+    def make_context(self, info_name, args, parent=None, **extra):
+        # First, let's parse the command and handle aliases
+        parsed_args = self.parse_command(info_name, args)
+
+        # Then create the context with the possibly modified args
+        ctx = super().make_context(
+            info_name=parsed_args[0], args=parsed_args[1:], parent=parent, **extra
+        )
+        return ctx
+
+    def parse_command(self, ctx_name, args):
+        """Parse command line arguments and handle aliases"""
+        if not args:
+            return [ctx_name]
+
+        # Check if the first argument is an alias
+        if args[0] in self._aliases:
+            pattern = self._aliases[args[0]]
+            # Split the pattern and combine with remaining args
+            pattern_parts = click.parser.split_arg_string(pattern)
+            # Replace the alias with the pattern parts
+            args = pattern_parts + args[1:]
+
+        return [ctx_name] + args
+
+    def get_command(self, ctx, cmd_name):
+        """Override to handle aliases in command lookup"""
+        if cmd_name in self._aliases:
+            return super().get_command(ctx, self._aliases[cmd_name].split()[0])
+        return super().get_command(ctx, cmd_name)
+
+
+@click.group(cls=AliasedCommandGroup)
 @click.version_option()
 def cli():
     """Manage Phabricator tasks from the comfort of your terminal"""
@@ -28,6 +76,11 @@ def cli():
 @cli.group(name="cache")
 def _cache():
     """Manage internal cache"""
+
+
+@cli.group
+def aliases():
+    """Manage aliases"""
 
 
 class Task(int):
@@ -427,6 +480,12 @@ def report_done_tasks(milestone: bool, format: str, source: str, destination: st
             click.echo("=" * 50)
         echo_task(click.echo, format, task)
         client.move_task_to_column(task["id"], column_destination_phid)
+
+
+@aliases.command()
+def list():
+    for name, alias in config.data.get("aliases", {}).items():
+        click.echo(f"{name} = {alias}")
 
 
 def runcli():
