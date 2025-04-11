@@ -78,7 +78,12 @@ def _cache():
     """Manage internal cache"""
 
 
-@cli.group
+@cli.group(name="config")
+def _config():
+    """Manage phable config"""
+
+
+@_config.group
 def aliases():
     """Manage aliases"""
 
@@ -420,8 +425,8 @@ def subscribe_to_task(ctx, task_ids: list[int]):
         client.add_user_to_task_subscribers(task_id=task_id, user_phid=user["phid"])
 
 
-@_cache.command()
-def show():
+@_cache.command(name="show")
+def show_cache():
     """Display the location of the internal phable cache"""
     click.echo(cache.cache_filepath)
 
@@ -431,6 +436,12 @@ def clear():
     """Delete the phable internal cache file"""
     cache.cache_filepath.unlink(missing_ok=True)
     atexit.unregister(cache.dump)  # avoid re-dumping the in-memory cache back to disk
+
+
+@_config.command(name="show")
+def show_config():
+    """Display the location of the phable config"""
+    click.echo(config.filepath)
 
 
 @cli.command(name="report-done-tasks")
