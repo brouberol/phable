@@ -20,9 +20,10 @@ atexit.register(cache.dump)
 
 @click.group()
 @click.version_option()
-def cli():
+@click.pass_context
+def cli(ctx: Context):
     """Manage Phabricator tasks from the comfort of your terminal"""
-    pass
+    ctx.obj = PhabricatorClient(config.phabricator_url, config.phabricator_token)
 
 
 @cli.group(name="cache")
@@ -48,7 +49,8 @@ class Task(int):
     help="Output format",
 )
 @click.argument("task-id", type=Task.from_str, required=True)
-def show_task(task_id: int, format: str = "plain"):
+@click.pass_obj
+def show_task(client: PhabricatorClient, task_id: int, format: str = "plain"):
     """Show task details
 
     \b
@@ -57,7 +59,6 @@ def show_task(task_id: int, format: str = "plain"):
     $ phable show T123456  --format=json  # show task details as json
 
     """
-    client = PhabricatorClient(config.phabricator_url, config.phabricator_token)
     if task := client.show_task(task_id):
         task = client.enrich_task(
             task,
@@ -134,8 +135,10 @@ def echo_task(echo: Callable[[str], None], format: str, task: dict[str, Any]) ->
 @click.option("--cc", multiple=True, help="Subscribers to associate to the task")
 @click.option("--owner", help="The username of the task owner")
 @click.pass_context
+@click.pass_obj
 def create_task(
-    ctx,
+    client: PhabricatorClient,
+    ctx: Context,
     title: str,
     description: Optional[str],
     template: Path,
@@ -178,7 +181,6 @@ def create_task(
     $ phable create --title 'A task' --cc brouberol
 
     """
-    client = PhabricatorClient(config.phabricator_url, config.phabricator_token)
     if template:
         if template.exists():
             description = template
@@ -257,7 +259,8 @@ def create_task(
 )
 @click.argument("task-ids", type=Task.from_str, nargs=VARIADIC, required=True)
 @click.pass_context
-def assign_task(ctx, task_ids: list[int], username: Optional[str]):
+@click.pass_obj
+def assign_task(client: PhabricatorClient, ctx: Context, task_ids: list[int], username: Optional[str]):
     """Assign one or multiple task ids to a username
 
     \b
@@ -266,7 +269,6 @@ def assign_task(ctx, task_ids: list[int], username: Optional[str]):
     $ phable assign T123456  brouberol  # asign to username
 
     """
-    client = PhabricatorClient(config.phabricator_url, config.phabricator_token)
     if not username:
         user = client.current_user()
     else:
@@ -294,8 +296,9 @@ def assign_task(ctx, task_ids: list[int], username: Optional[str]):
 )
 @click.argument("task-ids", type=Task.from_str, nargs=VARIADIC, required=True)
 @click.pass_context
+@click.pass_obj
 def move_task(
-    ctx: Context, task_ids: list[int], column: Optional[str], milestone: bool
+    client: PhabricatorClient, ctx: Context, task_ids: list[int], column: Optional[str], milestone: bool
 ) -> None:
     """Move one or several task on their current project board
 
@@ -309,7 +312,6 @@ def move_task(
 
     """
     try:
-        client = PhabricatorClient(config.phabricator_url, config.phabricator_token)
         target_project_phid = client.get_main_project_or_milestone(
             milestone, config.phabricator_default_project_phid
         )
@@ -332,7 +334,8 @@ def move_task(
     help="Comment text or path to a text file containing the comment body. If not provided, an editor will be opened.",
 )
 @click.argument("task-id", type=Task.from_str)
-def comment_on_task(task_id: int, comment: Optional[str]):
+@click.pass_obj
+def comment_on_task(client: PhabricatorClient, task_id: int, comment: Optional[str]):
     """Add a comment to a task
 
     \b
@@ -342,7 +345,6 @@ def comment_on_task(task_id: int, comment: Optional[str]):
     $ phable comment T123456                                # set comment body from your own text editor
 
     """
-    client = PhabricatorClient(config.phabricator_url, config.phabricator_token)
     comment = text_from_cli_arg_or_fs_or_editor(comment)
     client.create_or_edit_task(task_id=task_id, params={"comment": comment})
 
@@ -350,7 +352,8 @@ def comment_on_task(task_id: int, comment: Optional[str]):
 @cli.command(name="subscribe")
 @click.argument("task-ids", type=Task.from_str, nargs=VARIADIC, required=True)
 @click.pass_context
-def subscribe_to_task(ctx, task_ids: list[int]):
+@click.pass_obj
+def subscribe_to_task(client: PhabricatorClient, ctx: Context, task_ids: list[int]):
     """Subscribe to one or multiple task ids
 
     \b
@@ -359,7 +362,6 @@ def subscribe_to_task(ctx, task_ids: list[int]):
     $ phable subscribe T123456 T234567
 
     """
-    client = PhabricatorClient(config.phabricator_url, config.phabricator_token)
     user = client.current_user()
     if not user:
         ctx.fail("Current user was not found")
@@ -407,12 +409,12 @@ def clear():
     default="Reported",
     help="",
 )
-def report_done_tasks(milestone: bool, format: str, source: str, destination: str):
+@click.pass_obj
+def report_done_tasks(client: PhabricatorClient, milestone: bool, format: str, source: str, destination: str):
     """Print the details of all tasks in the `from` column and move them to the `to` column.
 
     This is used to produce the weekly reports, and document the tasks as reported once the report is done.
     """
-    client = PhabricatorClient(config.phabricator_url, config.phabricator_token)
     target_project_phid = client.get_main_project_or_milestone(
         milestone, config.phabricator_default_project_phid
     )
