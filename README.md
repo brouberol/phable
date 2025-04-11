@@ -59,10 +59,25 @@ Note: you can also expose these confriguration through the following environment
 - `PHABRICATOR_TOKEN`
 - `PHABRICATOR_DEFAULT_PROJECT_PHID`
 
-## Configuration
-
 ## Tips and tricks
 
+### Setting up aliases
+You can define command aliases. For example, instead of typing `phable move --column 'Done' --milestone T123456`, you might want to type `phable done T123456`. To do this, open the phable configuration file, with `$EDITOR $(phable config show)` and define an alias:
+
+```ini
+[aliases]
+done = move --column 'Done' --milestone
+```
+
+I personally currently have the follwing aliases:
+```console
+$ $phable config aliases list
+done = move --column 'Done' --milestone
+review = move --column 'Needs Review' --milestone
+wip = move --column 'In Progress' --milestone
+```
+
+### Phabricator task IDs as clickable links in iTerm2
 If you're using iTerm2, you can turn the task IDs into clickable links, by going to iTerm2 > Settings > Profiles > Advanced > Smart Selection > Edit > [+]:
 - Title: Phabricator Task Id
 - Action: Open URL
