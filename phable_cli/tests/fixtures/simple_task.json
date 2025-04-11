@@ -1,0 +1,98 @@
+{
+  "result": {
+    "data": [
+      {
+        "id": 390836,
+        "type": "TASK",
+        "phid": "PHID-TASK-n6ycf4xdtbuymcb54ozs",
+        "fields": {
+          "name": "brouberol: test task",
+          "description": {
+            "raw": "This is an issue about XXXX\n\nPlop\n"
+          },
+          "authorPHID": "PHID-USER-wniuzmzvlcmyao2o72qy",
+          "ownerPHID": null,
+          "status": {
+            "value": "open",
+            "name": "Open",
+            "color": null
+          },
+          "priority": {
+            "value": 50,
+            "name": "Medium",
+            "color": "orange"
+          },
+          "points": null,
+          "subtype": "default",
+          "closerPHID": null,
+          "dateClosed": null,
+          "spacePHID": "PHID-SPCE-6l6g5p53yi3mypnlpxjw",
+          "dateCreated": 1743586702,
+          "dateModified": 1743586750,
+          "policy": {
+            "view": "public",
+            "interact": "public",
+            "edit": "PHID-PLCY-3wn235efdwbui7ld6h6y"
+          },
+          "custom.deadline.due": null,
+          "custom.train.status": null,
+          "custom.train.backup": null,
+          "custom.external_reference": null,
+          "custom.release.version": null,
+          "custom.release.date": null,
+          "custom.security_topic": null,
+          "custom.risk.summary": null,
+          "custom.risk.impacted": null,
+          "custom.risk.rating": null,
+          "custom.requestor.affiliation": null,
+          "custom.error.reqid": null,
+          "custom.error.stack": null,
+          "custom.error.url": null,
+          "custom.error.id": null,
+          "custom.points.final": null,
+          "custom.deadline.start": null
+        },
+        "attachments": {
+          "subscribers": {
+            "subscriberPHIDs": [
+              "PHID-USER-wniuzmzvlcmyao2o72qy"
+            ],
+            "subscriberCount": 1,
+            "viewerIsSubscribed": false
+          },
+          "projects": {
+            "projectPHIDs": [
+              "PHID-PROJ-r456pnp5exj6uphuhwy6"
+            ]
+          },
+          "columns": {
+            "boards": {
+              "PHID-PROJ-r456pnp5exj6uphuhwy6": {
+                "columns": [
+                  {
+                    "id": 26365,
+                    "phid": "PHID-PCOL-zqdd2buhtlodgdouievd",
+                    "name": "Incoming"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    ],
+    "maps": {
+    },
+    "query": {
+      "queryKey": null
+    },
+    "cursor": {
+      "limit": 100,
+      "after": null,
+      "before": null,
+      "order": null
+    }
+  },
+  "error_code": null,
+  "error_info": null
+}
