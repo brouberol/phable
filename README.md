@@ -39,17 +39,27 @@ Commands:
 
 ## Setup
 
-For `phable` to work, you need to define the following environment variables:
+For `phable` to work, you need to define the follwoing configuration, by running `$EDITOR $(phable config show)`:
 
-- `PHABRICATOR_URL`: URL to your phabricator instance. Ex: `PHABRICATOR_URL=https://phabricator.wikimedia.org`
-- `PHABRICATOR_TOKEN`: Generate a token from ${PHABRICATOR_URL}/settings/user/${YOUR_USERNAME}/page/apitokens/
-- `PHABRICATOR_DEFAULT_PROJECT_PHID`: id for the Phabricator project to be used by default when creating tasks.
+```ini
+[phabricator]
+url = # URL to your phabricator instance. Ex: `url = https://phabricator.wikimedia.org`
+token = # API token. Generate a token from ${PHABRICATOR_URL}/settings/user/${YOUR_USERNAME}/page/apitokens/
+default_project_phid = # id for the Phabricator project to be used by default when creating tasks.
+```
 
-Note: to get `PHABRICATOR_DEFAULT_PROJECT_PHID`, define the first 2 environment variables, and run the following command, where T123456 is a task id belonging to your project.
+To get `default_project_phid`, define the first 2 configurations, and run the following command, where `T123456` is a task id belonging to your project.
 
 ```console
 $ phable show T123456 --format=json | jq -r '.attachments.projects.projectPHIDs[]'
 ```
+
+Note: you can also expose these confriguration through the following environment variables, for backwards compatibility:
+- `PHABRICATOR_URL`
+- `PHABRICATOR_TOKEN`
+- `PHABRICATOR_DEFAULT_PROJECT_PHID`
+
+## Configuration
 
 ## Tips and tricks
 

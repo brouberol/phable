@@ -2,14 +2,14 @@ import os
 import sys
 from configparser import ConfigParser
 from dataclasses import dataclass, field
-from functools import partial
+from functools import partial, cache
 from pathlib import Path
 
 import click
 
 
 _warnings = []
-
+_configparser = ConfigParser()
 CONFIG_HOME_PER_PLATFORM = {
     "darwin": Path.home() / "Library" / "Preferences",
     "linux": Path(os.getenv("XDG_CACHE_HOME", f"{Path.home()}/.config")),
@@ -18,16 +18,22 @@ CONFIG_HOME_PER_PLATFORM = {
 config_filepath = CONFIG_HOME_PER_PLATFORM[sys.platform] / "phable" / "config.ini"
 
 
-def os_getenv_or_raise(env_var_name: str):
+def get_from_config_or_env(config_value: str, env_var_name: str):
+    config = read_config()
+    if val := config.get("phabricator", {}).get(config_value):
+        return val
     if val := os.getenv(env_var_name):
         return val
     _warnings.append(f"Required environment variable {env_var_name} is not set")
 
 
-def field_with_default_from_env(env_var_name):
-    return field(default_factory=partial(os_getenv_or_raise, env_var_name))
+def field_with_default_from_config_then_env(config_value, env_var_name):
+    return field(
+        default_factory=partial(get_from_config_or_env, config_value, env_var_name)
+    )
 
 
+@cache
 def read_config() -> dict:
     if not config_filepath.parent.exists():
         config_filepath.parent.mkdir()
@@ -50,10 +56,14 @@ def read_config() -> dict:
 
 @dataclass()
 class Config:
-    phabricator_url: str = field_with_default_from_env("PHABRICATOR_URL")
-    phabricator_token: str = field_with_default_from_env("PHABRICATOR_TOKEN")
-    phabricator_default_project_phid: str = field_with_default_from_env(
-        "PHABRICATOR_DEFAULT_PROJECT_PHID"
+    phabricator_url: str = field_with_default_from_config_then_env(
+        "url", "PHABRICATOR_URL"
+    )
+    phabricator_token: str = field_with_default_from_config_then_env(
+        "token", "PHABRICATOR_TOKEN"
+    )
+    phabricator_default_project_phid: str = field_with_default_from_config_then_env(
+        "default_project_phid", "PHABRICATOR_DEFAULT_PROJECT_PHID"
     )
     filepath: Path = field(default=config_filepath)
     data: dict = field(default_factory=read_config)
