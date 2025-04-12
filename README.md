@@ -69,9 +69,9 @@ You can define command aliases. For example, instead of typing `phable move --co
 done = move --column 'Done' --milestone
 ```
 
-I personally currently have the follwing aliases:
+I personally currently have the following aliases:
 ```console
-$ $phable config aliases list
+$ phable config aliases list
 done = move --column 'Done' --milestone
 review = move --column 'Needs Review' --milestone
 wip = move --column 'In Progress' --milestone
