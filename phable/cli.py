@@ -2,7 +2,7 @@ import atexit
 import json
 import re
 from pathlib import Path
-from typing import Optional, Any, Callable
+from typing import Any, Callable, Optional
 
 import click
 from click import Context
@@ -67,7 +67,7 @@ class AliasedCommandGroup(click.Group):
 
 
 @click.group(cls=AliasedCommandGroup)
-@click.version_option()
+@click.version_option(package_name="phable")
 @click.pass_context
 def cli(ctx: Context):
     """Manage Phabricator tasks from the comfort of your terminal"""
@@ -318,7 +318,12 @@ def create_task(
 @click.argument("task-ids", type=Task.from_str, nargs=VARIADIC, required=True)
 @click.pass_context
 @click.pass_obj
-def assign_task(client: PhabricatorClient, ctx: Context, task_ids: list[int], username: Optional[str]):
+def assign_task(
+    client: PhabricatorClient,
+    ctx: Context,
+    task_ids: list[int],
+    username: Optional[str],
+):
     """Assign one or multiple task ids to a username
 
     \b
@@ -356,7 +361,11 @@ def assign_task(client: PhabricatorClient, ctx: Context, task_ids: list[int], us
 @click.pass_context
 @click.pass_obj
 def move_task(
-    client: PhabricatorClient, ctx: Context, task_ids: list[int], column: Optional[str], milestone: bool
+    client: PhabricatorClient,
+    ctx: Context,
+    task_ids: list[int],
+    column: Optional[str],
+    milestone: bool,
 ) -> None:
     """Move one or several task on their current project board
 
@@ -474,7 +483,13 @@ def show_config():
     help="",
 )
 @click.pass_obj
-def report_done_tasks(client: PhabricatorClient, milestone: bool, format: str, source: str, destination: str):
+def report_done_tasks(
+    client: PhabricatorClient,
+    milestone: bool,
+    format: str,
+    source: str,
+    destination: str,
+):
     """Print the details of all tasks in the `from` column and move them to the `to` column.
 
     This is used to produce the weekly reports, and document the tasks as reported once the report is done.

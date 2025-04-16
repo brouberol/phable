@@ -5,6 +5,7 @@ description = "Manage Phabricator tasks from the comfort of your terminal"
 authors = ["Balthazar Rouberol <br@imap.cc>"]
 license = "MIT"
 readme = "README.md"
+packages = [{ include = "phable" }]
 
 [tool.poetry.dependencies]
 python = "^3.9"
@@ -13,7 +14,7 @@ click = "^8.1.8"
 pytest = "^8.3.5"
 
 [tool.poetry.scripts]
-phable = 'phable_cli.cli:runcli'
+phable = 'phable.cli:runcli'
 
 [tool.poetry.group.dev.dependencies]
 responses = "^0.25.7"
