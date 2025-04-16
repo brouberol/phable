@@ -64,7 +64,7 @@ class AliasedCommandGroup(click.Group):
 
 
 @click.group(cls=AliasedCommandGroup)
-@click.version_option(package_name="phable")
+@click.version_option(package_name="phable-cli")
 @click.pass_context
 def cli(ctx: Context):
     """Manage Phabricator tasks from the comfort of your terminal"""
