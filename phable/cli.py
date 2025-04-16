@@ -14,9 +14,6 @@ from .utils import text_from_cli_arg_or_fs_or_editor
 
 VARIADIC = -1  # Used for click variadic arguments
 
-# Dump the in-memory cache to disk when existing the CLI
-atexit.register(cache.dump)
-
 
 class AliasedCommandGroup(click.Group):
     """Custom CLI group allowing the replaement of aliases commands on the fly
@@ -517,6 +514,8 @@ def list():
 
 
 def runcli():
+    # Dump the in-memory cache to disk when existing the CLI
+    atexit.register(cache.dump)
     cli(max_content_width=120)
 
 
