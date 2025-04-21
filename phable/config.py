@@ -9,7 +9,6 @@ import click
 
 
 _warnings = []
-_configparser = ConfigParser()
 CONFIG_HOME_PER_PLATFORM = {
     "darwin": Path.home() / "Library" / "Preferences",
     "linux": Path(os.getenv("XDG_CACHE_HOME", f"{Path.home()}/.config")),
