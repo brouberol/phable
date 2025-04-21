@@ -1,0 +1,1 @@
+VARIADIC = -1

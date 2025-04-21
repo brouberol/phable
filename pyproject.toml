@@ -14,7 +14,7 @@ click = "^8.1.8"
 pytest = "^8.3.5"
 
 [tool.poetry.scripts]
-phable = 'phable.cli:runcli'
+phable = 'phable.cli.main:runcli'
 
 [tool.poetry.group.dev.dependencies]
 responses = "^0.25.7"
