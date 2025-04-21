@@ -1,16 +1,18 @@
 import atexit
-import json
 import re
 from pathlib import Path
-from typing import Any, Callable, Optional
+from typing import Optional
 
 import click
 from click import Context
+
+from phable.utils import Task
 
 from .cache import cache
 from .config import config
 from .phabricator import PhabricatorClient
 from .utils import text_from_cli_arg_or_fs_or_editor
+from .display import display_task, display_tasks
 
 VARIADIC = -1  # Used for click variadic arguments
 
@@ -86,16 +88,6 @@ def aliases():
     """Manage aliases"""
 
 
-class Task(int):
-    @classmethod
-    def from_str(cls, value: str) -> int:
-        return int(value.lstrip("T"))
-
-    @classmethod
-    def from_int(cls, value: int) -> str:
-        return f"T{value}"
-
-
 @cli.command(name="show")
 @click.option(
     "--format",
@@ -122,47 +114,9 @@ def show_task(client: PhabricatorClient, task_id: int, format: str = "plain"):
             with_subtasks=True,
             with_parent=True,
         )
-        echo_task(click.echo, format, task)
+        display_task(task=task, format=format)
     else:
-        click.echo(f"Task {Task.from_int(task_id)} not found")
-
-
-def echo_task(echo: Callable[[str], None], format: str, task: dict[str, Any]) -> None:
-    """Print a task.
-
-    Print a task in a text or json format. The task needs to be enriched first.
-
-    To generalize the implementation and not couple it to the click library,
-    the user must pass an `echo` function that will be used to print the task.
-    """
-    if format == "json":
-        echo(json.dumps(task))
-    else:
-        parent_str = (
-            f"{Task.from_int(task['parent']['id'])} - {task['parent']['fields']['name']}"
-            if task.get("parent")
-            else ""
-        )
-        echo(f"URL: {task['url']}")
-        echo(f"Task: {Task.from_int(task['id'])}")
-        echo(f"Title: {task['fields']['name']}")
-        if task.get("author"):
-            echo(f"Author: {task['author']['fields']['username']}")
-        if task.get("owner"):
-            echo(f"Owner: {task['owner']}")
-        if task.get("tags"):
-            echo(f"Tags: {', '.join(task['tags'])}")
-        echo(f"Status: {task['fields']['status']['name']}")
-        echo(f"Priority: {task['fields']['priority']['name']}")
-        echo(f"Description: {task['fields']['description']['raw']}")
-        echo(f"Parent: {parent_str}")
-        echo("Subtasks:")
-        if task.get("subtasks"):
-            for subtask in task["subtasks"]:
-                status = f"{'[x]' if subtask['fields']['status']['value'] == 'resolved' else '[ ]'}"
-                echo(
-                    f"{status} - {Task.from_int(subtask['id'])} - @{subtask['owner']:<10} - {subtask['fields']['name']}"
-                )
+        click.echo(f"Task {Task.from_int(task_id)} not found", err=True)
 
 
 @cli.command(name="create")
@@ -499,12 +453,14 @@ def report_done_tasks(
         target_project_phid, destination
     )
     tasks = client.find_tasks_in_column(column_source_phid)
+
+    enriched_tasks = []
     for task in tasks:
         task = client.enrich_task(task)
-        if format == "plain":
-            click.echo("=" * 50)
-        echo_task(click.echo, format, task)
+        enriched_tasks.append(task)
         client.move_task_to_column(task["id"], column_destination_phid)
+
+    display_tasks(enriched_tasks, format=format)
 
 
 @aliases.command()

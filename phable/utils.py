@@ -35,3 +35,13 @@ def text_from_cli_arg_or_fs_or_editor(
         subprocess.run([os.environ["EDITOR"], txt_tmpfile.name])
         return Path(txt_tmpfile.name).read_text()
     return body_or_path
+
+
+class Task(int):
+    @classmethod
+    def from_str(cls, value: str) -> int:
+        return int(value.lstrip("T"))
+
+    @classmethod
+    def from_int(cls, value: int) -> str:
+        return f"T{value}"
