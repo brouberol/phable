@@ -1,39 +1,53 @@
 import json
-import click
 from typing import Literal, TypeAlias
 
 from .utils import Task
 
-TaskFormat: TypeAlias = Literal["plain", "json"]
+TaskFormat: TypeAlias = Literal["plain", "json", "html", "markdown"]
 
 
-def display_task(task: dict, format: TaskFormat):
+def display_task(task: dict, format: TaskFormat, prefix: str = "", end: str = "\n"):
+    column_name = task["attachments"]["columns"]["boards"][
+        task["attachments"]["projects"]["projectPHIDs"][0]
+    ]["columns"][0]["name"]
+    title = f"{Task.from_int(task['id'])} {task['fields']['name']} ({column_name})"
+
     if format == "json":
-        click.echo(json.dumps(task, indent=2))
+        print(json.dumps(task, indent=2))
+    elif format == "html":
+        print(
+            f"{prefix}<a href={task['url']}>{title}</a>",
+            end=end,
+        )
+    elif format == "markdown":
+        print(
+            f"{prefix}[{title}]({task['url']})",
+            end=end,
+        )
     else:
         parent_str = (
-            f"{Task.from_int(task['parent']['id'])} - {task['parent']['fields']['name']}"
+            f"{Task.from_int(task['parent']['id'])} {task['parent']['fields']['name']}"
             if task.get("parent")
             else ""
         )
-        click.echo(f"URL: {task['url']}")
-        click.echo(f"Task: {Task.from_int(task['id'])}")
-        click.echo(f"Title: {task['fields']['name']}")
+        print(f"URL: {task['url']}")
+        print(f"Task: {Task.from_int(task['id'])}")
+        print(f"Title: {task['fields']['name']}")
         if task.get("author"):
-            click.echo(f"Author: {task['author']['fields']['username']}")
+            print(f"Author: {task['author']['fields']['username']}")
         if task.get("owner"):
-            click.echo(f"Owner: {task['owner']}")
+            print(f"Owner: {task['owner']}")
         if task.get("tags"):
-            click.echo(f"Tags: {', '.join(task['tags'])}")
-        click.echo(f"Status: {task['fields']['status']['name']}")
-        click.echo(f"Priority: {task['fields']['priority']['name']}")
-        click.echo(f"Description: {task['fields']['description']['raw']}")
-        click.echo(f"Parent: {parent_str}")
-        click.echo("Subtasks:")
+            print(f"Tags: {', '.join(task['tags'])}")
+        print(f"Status: {task['fields']['status']['name']}")
+        print(f"Priority: {task['fields']['priority']['name']}")
+        print(f"Description: {task['fields']['description']['raw']}")
+        print(f"Parent: {parent_str}")
+        print("Subtasks:")
         if task.get("subtasks"):
             for subtask in task["subtasks"]:
                 status = f"{'[x]' if subtask['fields']['status']['value'] == 'resolved' else '[ ]'}"
-                click.echo(
+                print(
                     f"{status} - {Task.from_int(subtask['id'])} - @{subtask['owner']:<10} - {subtask['fields']['name']}"
                 )
 
@@ -43,12 +57,15 @@ def display_tasks(
     format: TaskFormat,
     separator: str = "=" * 50,
 ):
+    if len(tasks) == 1:
+        return display_task(tasks[0], format=format)
+
     if format == "json":
-        if len(tasks) == 1:
-            display_task(tasks[0], format=format)
-        else:
-            click.echo(json.dumps(tasks, indent=2))
+        print(json.dumps(tasks, indent=2))
+    elif format == "markdown":
+        for task in tasks:
+            display_task(task, format=format, prefix="* ")
     else:
         for task in tasks:
-            display_task(task, format=format)
-            click.echo(separator)
+            display_task(task, format=format, prefix="<li>", end="")
+            print(separator)
