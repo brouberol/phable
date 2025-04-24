@@ -91,3 +91,29 @@ If you're using iTerm2, you can turn the task IDs into clickable links, by going
 Then click on the new rule Notes field, and set it to Phabricator, and set the Regular expression field to `T\d{6}` (adjust the number of digits to what a task ID looks like in your instance. The latest created task has ID 385678 right now, so `\d{6}` gives us some leeway).
 
 One that is done, holding `Command` when hovering on a task ID should turn it into a link.
+
+### Enabling autocompletion
+
+#### bash
+
+Add this to `~/.bashrc`:
+```
+eval "$(_PHABLE_COMPLETE=bash_source phable)"
+```
+
+#### zsh
+
+Add this to `~/.zshrc`:
+
+```
+eval "$(_PHABLE_COMPLETE=zsh_source phable)"
+```
+
+#### fish
+
+Add this to `~/.config/fish/completions/phable.fish`:
+
+```
+_PHABLE_COMPLETE=fish_source phable | source
+```
+
