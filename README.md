@@ -29,12 +29,16 @@ Options:
   --help     Show this message and exit.
 
 Commands:
-  assign     Assign one or multiple task ids to a username
-  comment    Add a comment to a task
-  create     Create a new task
-  move       Move one or several task on their current project board
-  show       Show task details
-  subscribe  Subscribe to one or multiple task ids
+  assign             Assign one or multiple task ids to a username
+  cache              Manage internal cache
+  comment            Add a comment to a task
+  config             Manage phable config
+  create             Create a new task
+  list               Lists and filter tasks
+  move               Move one or several task on their current project board
+  report-done-tasks  Print the details of all tasks in the `from` column and move them to the `to` column.
+  show               Show task details
+  subscribe          Subscribe to one or multiple task ids
 ```
 
 ## Setup
@@ -75,6 +79,7 @@ $ phable config aliases list
 done = move --column 'Done' --milestone
 review = move --column 'Needs Review' --milestone
 wip = move --column 'In Progress' --milestone
+team-report = list --owner brouberol --column 'In Progress' --column 'Needs Review' --column 'Blocked/Waiting' --column Done --milestone --format html
 ```
 
 ### Phabricator task IDs as clickable links in iTerm2
