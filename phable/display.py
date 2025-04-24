@@ -7,10 +7,7 @@ TaskFormat: TypeAlias = Literal["plain", "json", "html", "markdown"]
 
 
 def display_task(task: dict, format: TaskFormat, prefix: str = "", end: str = "\n"):
-    column_name = task["attachments"]["columns"]["boards"][
-        task["attachments"]["projects"]["projectPHIDs"][0]
-    ]["columns"][0]["name"]
-    title = f"{Task.from_int(task['id'])} {task['fields']['name']} ({column_name})"
+    title = f"{Task.from_int(task['id'])} {task['fields']['name']} ({task['fields']['status']['name']})"
 
     if format == "json":
         print(json.dumps(task, indent=2))
