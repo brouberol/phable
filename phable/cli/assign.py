@@ -25,8 +25,12 @@ def assign_task(
 
     \b
     Examples:
-    $ phable assign T123456             # self assign task
-    $ phable assign T123456  brouberol  # asign to username
+    \b
+    # self assign task
+    $ phable assign T123456
+    \b
+    # asign to username
+    $ phable assign T123456  --usernamme brouberol
 
     """
     if not username:
