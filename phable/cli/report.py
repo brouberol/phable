@@ -51,7 +51,7 @@ def report_done_tasks(
     column_destination_phid = client.find_column_in_project(
         target_project_phid, destination
     )
-    tasks = client.find_tasks_in_column(column_source_phid)
+    tasks = client.find_tasks(column_phids=[column_source_phid])
 
     enriched_tasks = []
     for task in tasks:
