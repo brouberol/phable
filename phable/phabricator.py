@@ -163,9 +163,6 @@ class PhabricatorClient:
         parent = self.find_parent_task(subtask_id=task["id"])
         task["parent"] = parent
 
-    def find_tasks_in_column(self, column_phid: str) -> list[dict[str, Any]]:
-        return self.find_tasks(column_phid=column_phid)
-
     def find_tasks(
         self,
         column_phids: Optional[list[str]] = None,
