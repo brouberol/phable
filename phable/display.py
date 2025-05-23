@@ -1,10 +1,16 @@
 import json
 from collections.abc import Callable
-from typing import Literal, TypeAlias, Optional
+from enum import StrEnum, auto
+from typing import Literal, TypeAlias
 
 from .utils import Task
 
-TaskFormat: TypeAlias = Literal["plain", "json", "html", "markdown"]
+
+class TaskFormat(StrEnum):
+    PLAIN = auto()
+    JSON = auto()
+    HTML = auto()
+    MARKDOWN = auto()
 
 
 def display_tasks(
@@ -97,13 +103,13 @@ class PlainTaskPrinter(TaskPrinter):
 
 
 def get_printer(format: TaskFormat) -> TaskPrinter:
-    if format == "plain":
+    if format == TaskFormat.PLAIN:
         return PlainTaskPrinter(print)
-    elif format == "json":
+    elif format == TaskFormat.JSON:
         return JsonTaskPrinter(print)
-    elif format == "html":
+    elif format == TaskFormat.HTML:
         return HtmlTaskPrinter(print)
-    elif format == "markdown":
+    elif format == TaskFormat.MARKDOWN:
         return MarkdownTaskPrinter(print)
     else:
         raise ValueError(f"Unknown format: {format}")
