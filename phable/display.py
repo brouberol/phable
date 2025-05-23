@@ -6,6 +6,25 @@ from .utils import Task
 TaskFormat: TypeAlias = Literal["plain", "json", "html", "markdown"]
 
 
+def display_tasks(
+    tasks: list[dict],
+    format: TaskFormat,
+    separator: str = "=" * 50,
+):
+    if len(tasks) == 1:
+        return display_task(tasks[0], format=format)
+
+    if format == "json":
+        print(json.dumps(tasks, indent=2))
+    elif format == "markdown":
+        for task in tasks:
+            display_task(task, format=format, prefix="* ")
+    else:
+        for task in tasks:
+            display_task(task, format=format, prefix="<li>", end="")
+            print(separator)
+
+
 def display_task(task: dict, format: TaskFormat, prefix: str = "", end: str = "\n"):
     title = f"{Task.from_int(task['id'])} {task['fields']['name']} ({task['fields']['status']['name']})"
 
@@ -47,22 +66,3 @@ def display_task(task: dict, format: TaskFormat, prefix: str = "", end: str = "\
                 print(
                     f"{status} - {Task.from_int(subtask['id'])} - @{subtask['owner']:<10} - {subtask['fields']['name']}"
                 )
-
-
-def display_tasks(
-    tasks: list[dict],
-    format: TaskFormat,
-    separator: str = "=" * 50,
-):
-    if len(tasks) == 1:
-        return display_task(tasks[0], format=format)
-
-    if format == "json":
-        print(json.dumps(tasks, indent=2))
-    elif format == "markdown":
-        for task in tasks:
-            display_task(task, format=format, prefix="* ")
-    else:
-        for task in tasks:
-            display_task(task, format=format, prefix="<li>", end="")
-            print(separator)
