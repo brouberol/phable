@@ -11,6 +11,7 @@ class TaskFormat(StrEnum):
     JSON = auto()
     HTML = auto()
     MARKDOWN = auto()
+    WIKITEXT = auto()
 
 
 def display_tasks(
@@ -53,6 +54,16 @@ class MarkdownTaskPrinter(TaskPrinter):
 
     def print(self, task: dict) -> None:
         self._printer(f"* [{self.title(task)}]({task['url']})")
+
+    def print_list(self, tasks: list[dict]) -> None:
+        for task in tasks:
+            self.print(task)
+
+
+class WikitextTaskPrinter(TaskPrinter):
+
+    def print(self, task: dict) -> None:
+        self._printer(f"* [{task['url']} {self.title(task)}]")
 
     def print_list(self, tasks: list[dict]) -> None:
         for task in tasks:
@@ -111,5 +122,7 @@ def get_printer(format: TaskFormat) -> TaskPrinter:
         return HtmlTaskPrinter(print)
     elif format == TaskFormat.MARKDOWN:
         return MarkdownTaskPrinter(print)
+    elif format == TaskFormat.WIKITEXT:
+        return WikitextTaskPrinter(print)
     else:
         raise ValueError(f"Unknown format: {format}")
