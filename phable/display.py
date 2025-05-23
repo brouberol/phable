@@ -1,5 +1,6 @@
 import json
-from typing import Literal, TypeAlias
+from collections.abc import Callable
+from typing import Literal, TypeAlias, Optional
 
 from .utils import Task
 
@@ -9,41 +10,63 @@ TaskFormat: TypeAlias = Literal["plain", "json", "html", "markdown"]
 def display_tasks(
     tasks: list[dict],
     format: TaskFormat,
-    separator: str = "=" * 50,
-):
+) -> None:
     if len(tasks) == 1:
-        return display_task(tasks[0], format=format)
+        display_task(tasks[0], format=format)
+    get_printer(format).print_list(tasks)
 
-    if format == "json":
-        print(json.dumps(tasks, indent=2))
-    elif format == "markdown":
+def display_task(task: dict, format: TaskFormat) -> None:
+    get_printer(format).print(task)
+
+
+class TaskPrinter:
+
+    def __init__(self, printer: Callable):
+        self._printer = printer
+
+    def print(self, task: dict) -> None:
+        pass
+
+    def print_list(self, tasks: list[dict]) -> None:
+        pass
+
+    def title(self, task: dict) -> str:
+        return f"{Task.from_int(task['id'])} {task['fields']['name']} ({task['fields']['status']['name']})"
+
+
+class JsonTaskPrinter(TaskPrinter):
+
+    def print(self, task: dict) -> None:
+        self._printer(json.dumps(task, indent=2))
+
+    def print_list(self, tasks: list[dict]) -> None:
+        self._printer(json.dumps(tasks, indent=2))
+
+
+class MarkdownTaskPrinter(TaskPrinter):
+
+    def print(self, task: dict) -> None:
+        self._printer(f"* [{self.title(task)}]({task['url']})")
+
+    def print_list(self, tasks: list[dict]) -> None:
         for task in tasks:
-            display_task(task, format=format, prefix="* ")
-    else:
+            self.print(task)
+
+class HtmlTaskPrinter(TaskPrinter):
+
+    def print(self, task: dict) -> None:
+        self._printer(f"<a href={task['url']}>{self.title(task)}</a>")
+
+    def print_list(self, tasks: list[dict]) -> None:
         for task in tasks:
-            display_task(task, format=format, prefix="<li>", end="")
-            print(separator)
+            self._printer(f"<li><a href={task['url']}>{self.title(task)}</a></li>")
 
+class PlainTaskPrinter(TaskPrinter):
 
-def display_task(task: dict, format: TaskFormat, prefix: str = "", end: str = "\n"):
-    title = f"{Task.from_int(task['id'])} {task['fields']['name']} ({task['fields']['status']['name']})"
-
-    if format == "json":
-        print(json.dumps(task, indent=2))
-    elif format == "html":
-        print(
-            f"{prefix}<a href={task['url']}>{title}</a>",
-            end=end,
-        )
-    elif format == "markdown":
-        print(
-            f"{prefix}[{title}]({task['url']})",
-            end=end,
-        )
-    else:
+    def print(self, task: dict) -> None:
         parent_str = (
-            f"{Task.from_int(task['parent']['id'])} {task['parent']['fields']['name']}"
-            if task.get("parent")
+            self.title(task.get('parent'))
+            if task.get('parent')
             else ""
         )
         print(f"URL: {task['url']}")
@@ -66,3 +89,21 @@ def display_task(task: dict, format: TaskFormat, prefix: str = "", end: str = "\
                 print(
                     f"{status} - {Task.from_int(subtask['id'])} - @{subtask['owner']:<10} - {subtask['fields']['name']}"
                 )
+
+    def print_list(self, tasks: list[dict]) -> None:
+        for task in tasks:
+            self.print(task)
+            self._printer('='*50)
+
+
+def get_printer(format: TaskFormat) -> TaskPrinter:
+    if format == "plain":
+        return PlainTaskPrinter(print)
+    elif format == "json":
+        return JsonTaskPrinter(print)
+    elif format == "html":
+        return HtmlTaskPrinter(print)
+    elif format == "markdown":
+        return MarkdownTaskPrinter(print)
+    else:
+        raise ValueError(f"Unknown format: {format}")
