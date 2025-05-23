@@ -1,7 +1,7 @@
 import click
 from phable.config import config
 from phable.phabricator import PhabricatorClient
-from phable.display import display_tasks
+from phable.display import display_tasks, TaskFormat
 
 
 @click.command(name="report-done-tasks")
@@ -15,7 +15,7 @@ from phable.display import display_tasks
 )
 @click.option(
     "--format",
-    type=click.Choice(("plain", "json")),
+    type=click.Choice(TaskFormat, case_sensitive=False),
     default="plain",
     help="Output format",
 )

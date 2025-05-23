@@ -1,9 +1,11 @@
+from pickle import FALSE
+
 import click
 from typing import Optional
 
 from phable.phabricator import PhabricatorClient
 from phable.config import config
-from phable.display import display_tasks
+from phable.display import display_tasks, TaskFormat
 
 
 @click.command(name="list")
@@ -30,7 +32,7 @@ from phable.display import display_tasks
 @click.option(
     "--format",
     required=False,
-    type=click.Choice(("html", "plain", "json", "markdown")),
+    type=click.Choice(TaskFormat, case_sensitive=False),
     default="plain",
     help="The output format of the task list",
 )
@@ -42,7 +44,7 @@ def list_tasks(
     columns: list[str],
     owner: Optional[str] = None,
     milestone: bool = False,
-    format: str = "plain",
+    format: TaskFormat = TaskFormat.PLAIN,
 ):
     """Lists and filter tasks
 
@@ -78,4 +80,4 @@ def list_tasks(
         column_phids=column_phids, owner_phid=owner_user, project_phid=project_phid
     )
     tasks = [client.enrich_task(task) for task in tasks]
-    display_tasks(tasks=tasks, format=format, separator="")
+    display_tasks(tasks=tasks, format=format)
