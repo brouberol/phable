@@ -1,13 +1,13 @@
 import click
 from phable.utils import Task
 from phable.phabricator import PhabricatorClient
-from phable.display import display_task
+from phable.display import display_task, TaskFormat
 
 
 @click.command(name="show")
 @click.option(
     "--format",
-    type=click.Choice(("plain", "json")),
+    type=click.Choice(TaskFormat, case_sensitive=False),
     default="plain",
     help="Output format",
 )
