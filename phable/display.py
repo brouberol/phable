@@ -37,7 +37,10 @@ class TaskPrinter:
         pass
 
     def title(self, task: dict) -> str:
-        return f"{Task.from_int(task['id'])} {task['fields']['name']} ({task['fields']['status']['name']})"
+        return f"{Task.from_int(task['id'])} {task['fields']['name']}"
+
+    def status(self, task: dict) -> str:
+        return f"({task['fields']['status']['name']})"
 
 
 class JsonTaskPrinter(TaskPrinter):
@@ -49,9 +52,8 @@ class JsonTaskPrinter(TaskPrinter):
 
 
 class MarkdownTaskPrinter(TaskPrinter):
-
     def print(self, task: dict) -> None:
-        self._printer(f"* [{self.title(task)}]({task['url']})")
+        self._printer(f"* [{self.title(task)}]({task['url']}) {self.status(task)}")
 
     def print_list(self, tasks: list[dict]) -> None:
         for task in tasks:
@@ -60,29 +62,29 @@ class MarkdownTaskPrinter(TaskPrinter):
 
 class WikitextTaskPrinter(TaskPrinter):
     def print(self, task: dict) -> None:
-        self._printer(f"* [{task['url']} {self.title(task)}]")
+        self._printer(f"* [{task['url']} {self.title(task)}] {self.status(task)}")
 
     def print_list(self, tasks: list[dict]) -> None:
         for task in tasks:
             self.print(task)
 
-class HtmlTaskPrinter(TaskPrinter):
 
+class HtmlTaskPrinter(TaskPrinter):
     def print(self, task: dict) -> None:
-        self._printer(f"<a href={task['url']}>{self.title(task)}</a>")
+        self._printer(
+            f"<a href={task['url']}>{self.title(task)}</a> {self.status(task)}"
+        )
 
     def print_list(self, tasks: list[dict]) -> None:
         for task in tasks:
-            self._printer(f"<li><a href={task['url']}>{self.title(task)}</a></li>")
+            self._printer(
+                f"<li><a href={task['url']}>{self.title(task)}</a> {self.status(task)}</li>"
+            )
+
 
 class PlainTaskPrinter(TaskPrinter):
-
     def print(self, task: dict) -> None:
-        parent_str = (
-            self.title(task.get('parent'))
-            if task.get('parent')
-            else ""
-        )
+        parent_str = self.title(task.get("parent")) if task.get("parent") else ""
         print(f"URL: {task['url']}")
         print(f"Task: {Task.from_int(task['id'])}")
         print(f"Title: {task['fields']['name']}")
