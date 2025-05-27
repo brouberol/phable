@@ -1,5 +1,3 @@
-from pickle import FALSE
-
 import click
 from typing import Optional
 
