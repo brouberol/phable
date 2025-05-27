@@ -1,7 +1,6 @@
 import json
 from collections.abc import Callable
 from enum import StrEnum, auto
-from typing import Literal, TypeAlias
 
 from .utils import Task
 
@@ -22,12 +21,12 @@ def display_tasks(
         display_task(tasks[0], format=format)
     get_printer(format).print_list(tasks)
 
+
 def display_task(task: dict, format: TaskFormat) -> None:
     get_printer(format).print(task)
 
 
 class TaskPrinter:
-
     def __init__(self, printer: Callable):
         self._printer = printer
 
@@ -42,7 +41,6 @@ class TaskPrinter:
 
 
 class JsonTaskPrinter(TaskPrinter):
-
     def print(self, task: dict) -> None:
         self._printer(json.dumps(task, indent=2))
 
@@ -61,7 +59,6 @@ class MarkdownTaskPrinter(TaskPrinter):
 
 
 class WikitextTaskPrinter(TaskPrinter):
-
     def print(self, task: dict) -> None:
         self._printer(f"* [{task['url']} {self.title(task)}]")
 
@@ -110,7 +107,7 @@ class PlainTaskPrinter(TaskPrinter):
     def print_list(self, tasks: list[dict]) -> None:
         for task in tasks:
             self.print(task)
-            self._printer('='*50)
+            self._printer("=" * 50)
 
 
 def get_printer(format: TaskFormat) -> TaskPrinter:
