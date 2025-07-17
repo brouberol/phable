@@ -127,7 +127,9 @@ def create_task(
         task_params["projects.add"] = [config.phabricator_default_project_phid]
 
     if owner:
-        if owner_user := client.find_user_by_username(username=owner):
+        if owner == "self":
+            task_params["owner"] = client.current_user()["phid"]
+        elif owner_user := client.find_user_by_username(username=owner):
             task_params["owner"] = owner_user["phid"]
         else:
             ctx.fail(f"User {owner} not found")

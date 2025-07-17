@@ -59,7 +59,10 @@ def list_tasks(
 
     """
     if owner:
-        owner_user = client.find_user_by_username(owner)["phid"]
+        if owner == "self":
+            owner_user = client.current_user()["phid"]
+        else:
+            owner_user = client.find_user_by_username(owner)["phid"]
         if not owner_user:
             ctx.fail(f"User {owner} was not found")
     else:
