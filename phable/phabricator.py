@@ -1,6 +1,6 @@
 from datetime import timedelta
 from typing import Any, Optional, TypeVar
-
+from importlib.metadata import version
 import requests
 
 from .cache import cached
@@ -30,6 +30,10 @@ class PhabricatorClient:
         self.token = token
         self.session = requests.Session()
         self.timeout = 5
+        self.base_headers = {
+            "User-Agent": f"Phable/{version('phable_cli')} (https://pypi.org/project/phable-cli)",
+            "Content-Type": "application/x-www-form-urlencoded",
+        }
 
     def _first(self, result_set: list[T]) -> T:
         if result_set:
@@ -43,9 +47,7 @@ class PhabricatorClient:
     ) -> dict[str, Any]:
         """Helper method to make API requests"""
         headers = headers or {}
-        headers |= {
-            "Content-Type": "application/x-www-form-urlencoded",
-        }
+        headers |= self.base_headers
         params = params or {}
         data = {}
         data["api.token"] = self.token
