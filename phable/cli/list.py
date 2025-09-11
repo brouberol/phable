@@ -1,6 +1,7 @@
 import click
 from typing import Optional
 
+from phable.cli.utils import project_phid_option
 from phable.phabricator import PhabricatorClient
 from phable.config import config
 from phable.display import display_tasks, TaskFormat
@@ -19,6 +20,7 @@ from phable.display import display_tasks, TaskFormat
     required=False,
     help="The username the tasks should be assigned to",
 )
+@project_phid_option
 @click.option(
     "--milestone/--no-milestone",
     default=False,
@@ -40,6 +42,7 @@ def list_tasks(
     client: PhabricatorClient,
     ctx: click.Context,
     columns: list[str],
+    project_phid: Optional[str],
     owner: Optional[str] = None,
     milestone: bool = False,
     format: TaskFormat = TaskFormat.PLAIN,
@@ -68,7 +71,8 @@ def list_tasks(
     else:
         owner_user = None
     project_phid = client.get_main_project_or_milestone(
-        project_phid=config.phabricator_default_project_phid, milestone=milestone
+        milestone=milestone,
+        project_phid=project_phid or config.phabricator_default_project_phid,
     )
     if columns:
         column_phids = [
