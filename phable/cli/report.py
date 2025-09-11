@@ -1,10 +1,15 @@
+from typing import Optional
+
 import click
+
+from phable.cli.utils import project_phid_option
 from phable.config import config
 from phable.phabricator import PhabricatorClient
 from phable.display import display_tasks, TaskFormat
 
 
 @click.command(name="report-done-tasks")
+@project_phid_option
 @click.option(
     "--milestone/--no-milestone",
     default=False,
@@ -34,6 +39,7 @@ from phable.display import display_tasks, TaskFormat
 @click.pass_obj
 def report_done_tasks(
     client: PhabricatorClient,
+    project_phid: Optional[str],
     milestone: bool,
     format: str,
     source: str,
@@ -45,7 +51,8 @@ def report_done_tasks(
     This is used to produce the weekly reports, and document the tasks as reported once the report is done.
     """
     target_project_phid = client.get_main_project_or_milestone(
-        milestone, config.phabricator_default_project_phid
+        milestone=milestone,
+        project_phid=project_phid or config.phabricator_default_project_phid,
     )
     column_source_phid = client.find_column_in_project(target_project_phid, source)
     column_destination_phid = client.find_column_in_project(
