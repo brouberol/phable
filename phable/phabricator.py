@@ -1,5 +1,5 @@
 from datetime import timedelta
-from typing import Any, Optional, TypeVar
+from typing import Any, Optional, TypeVar, Sequence
 from importlib.metadata import version
 import requests
 
@@ -167,7 +167,7 @@ class PhabricatorClient:
 
     def find_tasks(
         self,
-        column_phids: Optional[list[str]] = None,
+        column_phids: Sequence[str],
         owner_phid: Optional[str] = None,
         project_phid: Optional[str] = None,
     ) -> list[dict[str, Any]]:

@@ -81,7 +81,7 @@ def list_tasks(
             for column in columns
         ]
     else:
-        column_phids = None
+        column_phids = []
     tasks = client.find_tasks(
         column_phids=column_phids, owner_phid=owner_user, project_phid=project_phid
     )
