@@ -73,7 +73,8 @@ class AliasedCommandGroup(click.Group):
 @click.pass_context
 def cli(ctx: Context):
     """Manage Phabricator tasks from the comfort of your terminal"""
-    ctx.obj = PhabricatorClient(config.phabricator_url, config.phabricator_token)
+    if ctx.invoked_subcommand not in ("cache", "config"):
+        ctx.obj = PhabricatorClient(config.phabricator_url, config.phabricator_token)
 
 
 cli.add_command(assign_task)

@@ -43,7 +43,7 @@ Commands:
 
 ## Setup
 
-For `phable` to work, you need to define the follwoing configuration, by running `$EDITOR $(phable config show)`:
+For `phable` to work, you need to define the following configuration, by running `$EDITOR $(phable config show)`:
 
 ```ini
 [phabricator]
@@ -58,7 +58,7 @@ To get `default_project_phid`, define the first 2 configurations, and run the fo
 $ phable show T123456 --format=json | jq -r '.attachments.projects.projectPHIDs[]'
 ```
 
-Note: you can also expose these confriguration through the following environment variables, for backwards compatibility:
+Note: you can also expose these configuration through the following environment variables, for backwards compatibility:
 - `PHABRICATOR_URL`
 - `PHABRICATOR_TOKEN`
 - `PHABRICATOR_DEFAULT_PROJECT_PHID`

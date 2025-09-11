@@ -23,7 +23,9 @@ def get_from_config_or_env(config_value: str, env_var_name: str):
         return val
     if val := os.getenv(env_var_name):
         return val
-    _warnings.append(f"Required environment variable {env_var_name} is not set")
+    _warnings.append(
+        f"Required config {config_value} / environment variable {env_var_name} not set"
+    )
 
 
 def field_with_default_from_config_then_env(config_value, env_var_name):
@@ -68,8 +70,16 @@ class Config:
     data: dict = field(default_factory=read_config)
 
     def __post_init__(self):
-        for warn in _warnings:
-            click.echo(click.style(warn, fg="yellow"), err=True)
+        if _warnings:
+            for warn in _warnings:
+                click.echo(click.style(warn, fg="yellow"), err=True)
+            click.echo(
+                click.style(
+                    "Refer to https://github.com/brouberol/phable?tab=readme-ov-file#setup to get setup",
+                    fg="yellow",
+                ),
+                err=True,
+            )
         return len(_warnings) == 0
 
 
