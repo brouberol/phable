@@ -17,6 +17,7 @@ from phable.cli.report import report_done_tasks
 from phable.cli.show import show_task
 from phable.cli.subscribe import subscribe_to_task
 from phable.cli.list import list_tasks
+from phable.cli.tag import tag_task
 
 
 class AliasedCommandGroup(click.Group):
@@ -85,6 +86,7 @@ cli.add_command(report_done_tasks)
 cli.add_command(show_task)
 cli.add_command(subscribe_to_task)
 cli.add_command(list_tasks)
+cli.add_command(tag_task)
 
 
 def runcli():

@@ -98,6 +98,16 @@ class PhabricatorClient:
             },
         )["result"]["data"][0]
 
+    @cached
+    def show_tag(self, tag_name: str) -> dict[str, Any]:
+        """Show a Maniphest task"""
+        results = self._make_request(
+            "project.search",
+            params={"constraints[query]": tag_name},
+        )["result"]["data"]
+        results = [tag for tag in results if tag["fields"]["name"] == tag_name]
+        return self._first(results)
+
     def enrich_task(
         self,
         task: dict[str, Any],
@@ -251,6 +261,12 @@ class PhabricatorClient:
     def assign_task_to_user(self, task_id: int, user_phid: int) -> dict[str, Any]:
         """Set the owner of the argument task to the argument user id"""
         return self.create_or_edit_task(task_id=task_id, params={"owner": user_phid})
+
+    def assign_tag_to_task(self, task_id: int, tag_phid: int) -> dict[str, Any]:
+        """Set the owner of the argument task to the argument user id"""
+        return self.create_or_edit_task(
+            task_id=task_id, params={"projects.add": [tag_phid]}
+        )
 
     @cached(ttl=timedelta(days=1))
     def list_project_columns(
