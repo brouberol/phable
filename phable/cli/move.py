@@ -1,7 +1,7 @@
 import click
 from typing import Optional
 from phable.config import config
-from phable.cli.utils import VARIADIC
+from phable.cli.utils import VARIADIC, project_phid_option
 from phable.phabricator import PhabricatorClient
 from phable.utils import Task
 
@@ -11,7 +11,7 @@ from phable.utils import Task
     "--column",
     type=str,
     required=True,
-    help="Name of destination column on the current project board",
+    help="Name of destination column.",
 )
 @click.option(
     "--milestone/--no-milestone",
@@ -21,12 +21,14 @@ from phable.utils import Task
         "milestone board, instead of the project board itself"
     ),
 )
+@project_phid_option
 @click.argument("task-ids", type=Task.from_str, nargs=VARIADIC, required=True)
 @click.pass_context
 @click.pass_obj
 def move_task(
     client: PhabricatorClient,
     ctx: click.Context,
+    project_phid: Optional[str],
     task_ids: list[int],
     column: Optional[str],
     milestone: bool,
@@ -40,11 +42,13 @@ def move_task(
     Example:
     $ phable move T123456 --column 'In Progress'
     $ phable move T123456 T234567 --column 'Done'
+    $ phable move --project-phid PHID-PROJ-1234567890 --column 'Done' T123456
 
     """
     try:
         target_project_phid = client.get_main_project_or_milestone(
-            milestone, config.phabricator_default_project_phid
+            milestone=milestone,
+            project_phid=project_phid or config.phabricator_default_project_phid,
         )
         target_column_phid = client.find_column_in_project(target_project_phid, column)
 
