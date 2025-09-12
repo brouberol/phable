@@ -1,7 +1,7 @@
 import click
 from typing import Optional
 
-from phable.cli.utils import project_phid_option
+from phable.cli.utils import project_phid_option, find_project_phid_by_title
 from phable.phabricator import PhabricatorClient
 from phable.config import config
 from phable.display import display_tasks, TaskFormat
@@ -42,7 +42,7 @@ def list_tasks(
     client: PhabricatorClient,
     ctx: click.Context,
     columns: list[str],
-    project_phid: Optional[str],
+    project: Optional[str],
     owner: Optional[str] = None,
     milestone: bool = False,
     format: TaskFormat = TaskFormat.PLAIN,
@@ -70,9 +70,10 @@ def list_tasks(
             ctx.fail(f"User {owner} was not found")
     else:
         owner_user = None
+
     project_phid = client.get_main_project_or_milestone(
         milestone=milestone,
-        project_phid=project_phid or config.phabricator_default_project_phid,
+        project_phid=find_project_phid_by_title(client, ctx, project) or config.phabricator_default_project_phid,
     )
     if columns:
         column_phids = [
