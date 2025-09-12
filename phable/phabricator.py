@@ -98,16 +98,6 @@ class PhabricatorClient:
             },
         )["result"]["data"][0]
 
-    @cached
-    def show_tag(self, tag_name: str) -> dict[str, Any]:
-        """Show a Maniphest task"""
-        results = self._make_request(
-            "project.search",
-            params={"constraints[query]": tag_name},
-        )["result"]["data"]
-        results = [tag for tag in results if tag["fields"]["name"] == tag_name]
-        return self._first(results)
-
     def enrich_task(
         self,
         task: dict[str, Any],

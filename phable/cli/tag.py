@@ -17,7 +17,7 @@ def tag_task(client: PhabricatorClient, task_ids: list[int], tag: Optional[str])
     $ phable tag T123456 T123457 --tag 'Essential work'  # add multiple tags to a task
 
     """
-    if tag := client.show_tag(tag_name=tag):
+    if tag := client.find_project_by_title(title=tag):
         for task_id in task_ids:
             client.assign_tag_to_task(task_id=task_id, tag_phid=tag["phid"])
     else:
