@@ -2,7 +2,7 @@ from typing import Optional
 
 import click
 
-from phable.cli.utils import project_phid_option
+from phable.cli.utils import project_phid_option, find_project_phid_by_title
 from phable.config import config
 from phable.phabricator import PhabricatorClient
 from phable.display import display_tasks, TaskFormat
@@ -39,7 +39,8 @@ from phable.display import display_tasks, TaskFormat
 @click.pass_obj
 def report_done_tasks(
     client: PhabricatorClient,
-    project_phid: Optional[str],
+    ctx: click.Context,
+    project: Optional[str],
     milestone: bool,
     format: str,
     source: str,
@@ -52,7 +53,7 @@ def report_done_tasks(
     """
     target_project_phid = client.get_main_project_or_milestone(
         milestone=milestone,
-        project_phid=project_phid or config.phabricator_default_project_phid,
+        project_phid=find_project_phid_by_title(client, ctx, project) or config.phabricator_default_project_phid,
     )
     column_source_phid = client.find_column_in_project(target_project_phid, source)
     column_destination_phid = client.find_column_in_project(
