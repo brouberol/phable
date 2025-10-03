@@ -42,7 +42,7 @@ def move_task(
     Example:
     $ phable move T123456 --column 'In Progress'
     $ phable move T123456 T234567 --column 'Done'
-    $ phable move --project-phid PHID-PROJ-1234567890 --column 'Done' T123456
+    $ phable move --project "SRE Milestone 5" --column 'Done' T123456
 
     """
     try:
