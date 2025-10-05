@@ -1,7 +1,9 @@
-import click
 from typing import Optional
-from phable.utils import Task, text_from_cli_arg_or_fs_or_editor
+
+import click
+
 from phable.phabricator import PhabricatorClient
+from phable.utils import Task, text_from_cli_arg_or_fs_or_editor
 
 
 @click.command(name="comment")

@@ -1,6 +1,7 @@
 from datetime import timedelta
-from typing import Any, Optional, TypeVar, Sequence
 from importlib.metadata import version
+from typing import Any, Optional, Sequence, TypeVar
+
 import requests
 
 from .cache import cached

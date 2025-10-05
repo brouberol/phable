@@ -1,9 +1,10 @@
-import click
 from typing import Optional
 
+import click
+
+from phable.cli.utils import VARIADIC
 from phable.phabricator import PhabricatorClient
 from phable.utils import Task
-from phable.cli.utils import VARIADIC
 
 
 @click.command(name="assign")

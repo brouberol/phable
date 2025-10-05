@@ -1,11 +1,13 @@
-import click
 import re
-from typing import Optional
 from pathlib import Path
-from phable.phabricator import PhabricatorClient
-from phable.utils import text_from_cli_arg_or_fs_or_editor, Task
-from phable.config import config
+from typing import Optional
+
+import click
+
 from phable.cli.show import show_task
+from phable.config import config
+from phable.phabricator import PhabricatorClient
+from phable.utils import Task, text_from_cli_arg_or_fs_or_editor
 
 
 @click.command(name="create")

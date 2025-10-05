@@ -1,5 +1,6 @@
-import click
 import atexit
+
+import click
 
 from phable.cache import cache
 

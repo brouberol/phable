@@ -1,7 +1,9 @@
-import click
 from typing import Optional
-from phable.phabricator import PhabricatorClient, Task
+
+import click
+
 from phable.cli.utils import VARIADIC
+from phable.phabricator import PhabricatorClient, Task
 
 
 @click.command(name="tag")

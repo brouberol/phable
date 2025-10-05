@@ -3,21 +3,20 @@ import atexit
 import click
 from click import Context
 
-
 from phable.cache import cache
-from phable.config import config
-from phable.phabricator import PhabricatorClient
 from phable.cli.assign import assign_task
 from phable.cli.cache import _cache
 from phable.cli.comment import comment_on_task
 from phable.cli.config import _config
 from phable.cli.create import create_task
+from phable.cli.list import list_tasks
 from phable.cli.move import move_task
 from phable.cli.report import report_done_tasks
 from phable.cli.show import show_task
 from phable.cli.subscribe import subscribe_to_task
-from phable.cli.list import list_tasks
 from phable.cli.tag import tag_task
+from phable.config import config
+from phable.phabricator import PhabricatorClient
 
 
 class AliasedCommandGroup(click.Group):

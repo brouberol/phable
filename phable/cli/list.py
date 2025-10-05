@@ -1,10 +1,11 @@
-import click
 from typing import Optional
 
-from phable.cli.utils import project_phid_option, find_project_phid_by_title
-from phable.phabricator import PhabricatorClient
+import click
+
+from phable.cli.utils import find_project_phid_by_title, project_phid_option
 from phable.config import config
-from phable.display import display_tasks, TaskFormat
+from phable.display import TaskFormat, display_tasks
+from phable.phabricator import PhabricatorClient
 
 
 @click.command(name="list")
@@ -73,7 +74,8 @@ def list_tasks(
 
     project_phid = client.get_main_project_or_milestone(
         milestone=milestone,
-        project_phid=find_project_phid_by_title(client, ctx, project) or config.phabricator_default_project_phid,
+        project_phid=find_project_phid_by_title(client, ctx, project)
+        or config.phabricator_default_project_phid,
     )
     if columns:
         column_phids = [

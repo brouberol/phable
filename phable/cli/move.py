@@ -1,7 +1,9 @@
-import click
 from typing import Optional
+
+import click
+
+from phable.cli.utils import VARIADIC, find_project_phid_by_title, project_phid_option
 from phable.config import config
-from phable.cli.utils import VARIADIC, project_phid_option, find_project_phid_by_title
 from phable.phabricator import PhabricatorClient
 from phable.utils import Task
 
@@ -48,7 +50,8 @@ def move_task(
     try:
         target_project_phid = client.get_main_project_or_milestone(
             milestone=milestone,
-            project_phid=find_project_phid_by_title(client, ctx, project) or config.phabricator_default_project_phid,
+            project_phid=find_project_phid_by_title(client, ctx, project)
+            or config.phabricator_default_project_phid,
         )
         target_column_phid = client.find_column_in_project(target_project_phid, column)
 

@@ -2,11 +2,10 @@ import os
 import sys
 from configparser import ConfigParser
 from dataclasses import dataclass, field
-from functools import partial, cache
+from functools import cache, partial
 from pathlib import Path
 
 import click
-
 
 _warnings = []
 CONFIG_HOME_PER_PLATFORM = {
