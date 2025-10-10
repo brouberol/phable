@@ -36,6 +36,7 @@ from phable.phabricator import PhabricatorClient
     default="Reported",
     help="",
 )
+@click.pass_context
 @click.pass_obj
 def report_done_tasks(
     client: PhabricatorClient,
