@@ -87,5 +87,10 @@ def list_tasks(
     tasks = client.find_tasks(
         column_phids=column_phids, owner_phid=owner_user, project_phid=project_phid
     )
+    tasks += client.find_tasks(
+        column_phids=column_phids,
+        backup_owner_phid=owner_user,
+        project_phid=project_phid,
+    )
     tasks = [client.enrich_task(task) for task in tasks]
     display_tasks(tasks=tasks, format=format)

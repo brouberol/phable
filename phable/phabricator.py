@@ -1,6 +1,6 @@
 from datetime import timedelta
 from importlib.metadata import version
-from typing import Any, Optional, Sequence, TypeVar
+from typing import Any, Optional, TypeVar
 
 import requests
 
@@ -168,8 +168,9 @@ class PhabricatorClient:
 
     def find_tasks(
         self,
-        column_phids: Sequence[str],
+        column_phids: Optional[list[str]] = None,
         owner_phid: Optional[str] = None,
+        backup_owner_phid: Optional[str] = None,
         project_phid: Optional[str] = None,
     ) -> list[dict[str, Any]]:
         params = {
@@ -181,6 +182,8 @@ class PhabricatorClient:
             params[f"constraints[columnPHIDs][{i}]"] = column_phid
         if owner_phid:
             params["constraints[assigned][0]"] = owner_phid
+        elif backup_owner_phid:
+            params["constraints[custom.train.backup][0]"] = backup_owner_phid
         if project_phid:
             params["constraints[projects][0]"] = project_phid
         return self._make_request("maniphest.search", params=params)["result"]["data"]
