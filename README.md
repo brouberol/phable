@@ -9,6 +9,7 @@ It tries to be very simple and not go overboard with features. You can:
 - move a task to a column on its current board
 - assign a task to a user
 - add a comment to a task
+- and more (see `phable --help` output for the full feature list)
 
 ## Installation
 
