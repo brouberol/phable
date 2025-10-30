@@ -1,6 +1,6 @@
 from datetime import timedelta
 from importlib.metadata import version
-from typing import Any, Optional, TypeVar
+from typing import Any, Literal, Optional, TypeVar
 
 import requests
 
@@ -262,10 +262,15 @@ class PhabricatorClient:
             task_id=task_id, params={"projects.add": [tag_phid]}
         )
 
-    def set_parent_task_id(self, task_id: int, parent_task_phid: str) -> dict[str, Any]:
-        """Set the parent_id of the argument task"""
+    def edit_parent_tasks(
+        self,
+        task_id: int,
+        parent_task_phids: list[str],
+        action: Literal["add", "remove", "set"],
+    ) -> dict[str, Any]:
+        """Edit the parent_id of the argument task"""
         return self.create_or_edit_task(
-            task_id=task_id, params={"parents.set": [parent_task_phid]}
+            task_id=task_id, params={f"parents.{action}": parent_task_phids}
         )
 
     @cached(ttl=timedelta(days=1))

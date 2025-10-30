@@ -11,7 +11,7 @@ from phable.cli.config import _config
 from phable.cli.create import create_task
 from phable.cli.list import list_tasks
 from phable.cli.move import move_task
-from phable.cli.parent import change_task_parent
+from phable.cli.parent import parent
 from phable.cli.report import report_done_tasks
 from phable.cli.show import show_task
 from phable.cli.subscribe import subscribe_to_task
@@ -97,7 +97,7 @@ cli.add_command(show_task)
 cli.add_command(subscribe_to_task)
 cli.add_command(list_tasks)
 cli.add_command(tag_task)
-cli.add_command(change_task_parent)
+cli.add_command(parent)
 
 
 def runcli():

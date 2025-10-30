@@ -36,9 +36,11 @@ Commands:
   create             Create a new task
   list               Lists and filter tasks
   move               Move one or several task on their current project board
+  parent             Manage task parents
   report-done-tasks  Print the details of all tasks in the `from` column and move them to the `to` column.
   show               Show task details
   subscribe          Subscribe to one or multiple task ids
+  tag                Add a tag on one or multiple tasks
 ```
 
 ## Setup
@@ -116,4 +118,3 @@ Add this to `~/.config/fish/completions/phable.fish`:
 ```
 _PHABLE_COMPLETE=fish_source phable | source
 ```
-
