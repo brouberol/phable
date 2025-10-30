@@ -67,6 +67,15 @@ class AliasedCommandGroup(click.Group):
             return super().get_command(ctx, self._aliases[cmd_name].split()[0])
         return super().get_command(ctx, cmd_name)
 
+    def format_help(self, ctx, formatter):
+        super().format_help(ctx, formatter)
+        formatter.write("\nAliases:")
+        largest_alias = max(map(len, ctx.command.commands.keys()))
+        total_spacing = largest_alias + 2
+        for alias_name, alias in self._aliases.items():
+            spacing = " " * (total_spacing - len(alias_name))
+            formatter.write(f"\n  {alias_name}{spacing}{alias}")
+
 
 @click.group(cls=AliasedCommandGroup)
 @click.version_option(package_name="phable-cli")
