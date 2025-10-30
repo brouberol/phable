@@ -2,11 +2,11 @@ import click
 
 from phable.cli.utils import VARIADIC
 from phable.phabricator import PhabricatorClient
-from phable.utils import Task
+from phable.utils import TASK_ID
 
 
 @click.command(name="subscribe")
-@click.argument("task-ids", type=Task.from_str, nargs=VARIADIC, required=True)
+@click.argument("task-ids", type=TASK_ID, nargs=VARIADIC, required=True)
 @click.pass_context
 @click.pass_obj
 def subscribe_to_task(

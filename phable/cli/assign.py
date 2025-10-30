@@ -4,7 +4,7 @@ import click
 
 from phable.cli.utils import VARIADIC
 from phable.phabricator import PhabricatorClient
-from phable.utils import Task
+from phable.utils import TASK_ID
 
 
 @click.command(name="assign")
@@ -13,7 +13,7 @@ from phable.utils import Task
     required=False,
     help="The username to assign the task to. Self-assign the task if not provided.",
 )
-@click.argument("task-ids", type=Task.from_str, nargs=VARIADIC, required=True)
+@click.argument("task-ids", type=TASK_ID, nargs=VARIADIC, required=True)
 @click.pass_context
 @click.pass_obj
 def assign_task(

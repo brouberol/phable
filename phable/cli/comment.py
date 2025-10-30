@@ -3,7 +3,7 @@ from typing import Optional
 import click
 
 from phable.phabricator import PhabricatorClient
-from phable.utils import Task, text_from_cli_arg_or_fs_or_editor
+from phable.utils import TASK_ID, text_from_cli_arg_or_fs_or_editor
 
 
 @click.command(name="comment")
@@ -12,7 +12,7 @@ from phable.utils import Task, text_from_cli_arg_or_fs_or_editor
     type=str,
     help="Comment text or path to a text file containing the comment body. If not provided, an editor will be opened.",
 )
-@click.argument("task-id", type=Task.from_str)
+@click.argument("task-id", type=TASK_ID)
 @click.pass_obj
 def comment_on_task(client: PhabricatorClient, task_id: int, comment: Optional[str]):
     """Add a comment to a task

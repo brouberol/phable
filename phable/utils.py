@@ -3,6 +3,8 @@ import subprocess
 import tempfile
 from pathlib import Path
 
+import click
+
 
 def text_from_cli_arg_or_fs_or_editor(
     body_or_path: str, force_editor: bool = False
@@ -38,6 +40,7 @@ def text_from_cli_arg_or_fs_or_editor(
 
 
 class Task(int):
+
     @classmethod
     def from_str(cls, value: str) -> int:
         return int(value.lstrip("T"))
@@ -45,3 +48,13 @@ class Task(int):
     @classmethod
     def from_int(cls, value: int) -> str:
         return f"T{value}"
+
+
+class TaskParamType(click.ParamType):
+    name = "task_id"
+
+    def convert(self, value, param, ctx):
+        return Task.from_str(value)
+
+
+TASK_ID = TaskParamType()

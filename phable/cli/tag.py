@@ -3,12 +3,13 @@ from typing import Optional
 import click
 
 from phable.cli.utils import VARIADIC
-from phable.phabricator import PhabricatorClient, Task
+from phable.phabricator import PhabricatorClient
+from phable.utils import TASK_ID
 
 
 @click.command(name="tag")
 @click.option("--tag", type=str, help="Tag name")
-@click.argument("task-ids", type=Task.from_str, nargs=VARIADIC)
+@click.argument("task-ids", type=TASK_ID, nargs=VARIADIC)
 @click.pass_obj
 def tag_task(client: PhabricatorClient, task_ids: list[int], tag: Optional[str]):
     """Add a tag on one or multiple tasks

@@ -2,7 +2,7 @@ import click
 
 from phable.display import TaskFormat, display_task
 from phable.phabricator import PhabricatorClient
-from phable.utils import Task
+from phable.utils import TASK_ID
 
 
 @click.command(name="show")
@@ -12,7 +12,7 @@ from phable.utils import Task
     default="plain",
     help="Output format",
 )
-@click.argument("task-id", type=Task.from_str, required=True)
+@click.argument("task-id", type=TASK_ID, required=True)
 @click.pass_obj
 def show_task(client: PhabricatorClient, task_id: int, format: str = "plain"):
     """Show task details

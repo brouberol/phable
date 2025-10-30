@@ -7,7 +7,7 @@ import click
 from phable.cli.show import show_task
 from phable.config import config
 from phable.phabricator import PhabricatorClient
-from phable.utils import Task, text_from_cli_arg_or_fs_or_editor
+from phable.utils import TASK_ID, text_from_cli_arg_or_fs_or_editor
 
 
 @click.command(name="create")
@@ -30,7 +30,7 @@ from phable.utils import Task, text_from_cli_arg_or_fs_or_editor
     help="Priority level of the task",
     default="normal",
 )
-@click.option("--parent-id", type=Task.from_str, help="ID of parent task")
+@click.option("--parent-id", type=TASK_ID, help="ID of parent task")
 @click.option("--tags", multiple=True, help="Tags to associate to the task")
 @click.option("--cc", multiple=True, help="Subscribers to associate to the task")
 @click.option("--owner", help="The username of the task owner")

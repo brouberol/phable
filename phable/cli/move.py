@@ -5,7 +5,7 @@ import click
 from phable.cli.utils import VARIADIC, find_project_phid_by_title, project_phid_option
 from phable.config import config
 from phable.phabricator import PhabricatorClient
-from phable.utils import Task
+from phable.utils import TASK_ID
 
 
 @click.command(name="move")
@@ -24,7 +24,7 @@ from phable.utils import Task
     ),
 )
 @project_phid_option
-@click.argument("task-ids", type=Task.from_str, nargs=VARIADIC, required=True)
+@click.argument("task-ids", type=TASK_ID, nargs=VARIADIC, required=True)
 @click.pass_context
 @click.pass_obj
 def move_task(
