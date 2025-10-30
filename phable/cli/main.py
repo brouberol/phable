@@ -69,6 +69,8 @@ class AliasedCommandGroup(click.Group):
 
     def format_help(self, ctx, formatter):
         super().format_help(ctx, formatter)
+        if not self._aliases:
+            return
         formatter.write("\nAliases:")
         largest_alias = max(map(len, ctx.command.commands.keys()))
         total_spacing = largest_alias + 2
