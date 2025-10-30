@@ -1,10 +1,8 @@
-from typing import Optional
-
 import click
 
 from phable.cli.utils import VARIADIC
 from phable.phabricator import PhabricatorClient
-from phable.utils import TASK_ID, Task
+from phable.utils import TASK_ID
 
 
 @click.group()
@@ -15,11 +13,9 @@ def parent():
 @parent.command(name="set")
 @click.argument("task-ids", type=TASK_ID, nargs=VARIADIC, required=True)
 @click.option("--parent-ids", type=TASK_ID, help="ID(s) of parent task", multiple=True)
-@click.pass_context
 @click.pass_obj
 def set_task_parent(
     client: PhabricatorClient,
-    ctx: click.Context,
     task_ids: list[int],
     parent_ids: list[int],
 ):
@@ -51,11 +47,9 @@ def set_task_parent(
 @parent.command(name="add")
 @click.argument("task-ids", type=TASK_ID, nargs=VARIADIC, required=True)
 @click.option("--parent-ids", type=TASK_ID, help="ID(s) of parent task", multiple=True)
-@click.pass_context
 @click.pass_obj
-def set_task_parent(
+def add_task_parent(
     client: PhabricatorClient,
-    ctx: click.Context,
     task_ids: list[int],
     parent_ids: list[int],
 ):
@@ -87,11 +81,9 @@ def set_task_parent(
 @parent.command(name="remove")
 @click.argument("task-ids", type=TASK_ID, nargs=VARIADIC, required=True)
 @click.option("--parent-ids", type=TASK_ID, help="ID(s) of parent task", multiple=True)
-@click.pass_context
 @click.pass_obj
-def set_task_parent(
+def remove_task_parent(
     client: PhabricatorClient,
-    ctx: click.Context,
     task_ids: list[int],
     parent_ids: list[int],
 ):
