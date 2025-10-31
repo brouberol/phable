@@ -40,6 +40,7 @@ Commands:
   parent             Manage task parents
   report-done-tasks  Print the details of all tasks in the `from` column and move them to the `to` column.
   show               Show task details
+  status             Set the status of one or multiple tasks
   subscribe          Subscribe to one or multiple task ids
   tag                Add a tag on one or multiple tasks
 ```

@@ -1,3 +1,5 @@
+from enum import StrEnum
+
 import click
 
 
@@ -19,3 +21,12 @@ class TaskParamType(click.ParamType):
 
 
 TASK_ID = TaskParamType()
+
+
+class TaskStatus(StrEnum):
+    open = "open"
+    resolved = "resolved"
+    progress = "progress"
+    stalled = "stalled"
+    invalid = "invalid"
+    declined = "declined"

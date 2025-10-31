@@ -5,6 +5,7 @@ from typing import Any, Literal, Optional, TypeVar
 import requests
 
 from .cache import cached
+from .task import TaskStatus
 
 T = TypeVar("T")
 
@@ -207,13 +208,16 @@ class PhabricatorClient:
         """Move the argument task to column of associated column id"""
         return self.create_or_edit_task(task_id=task_id, params={"column": column_phid})
 
+    def set_task_status(self, task_id: int, status: TaskStatus) -> dict[str, Any]:
+        return self.create_or_edit_task(task_id=task_id, params={"status": status})
+
     def mark_task_as_resolved(self, task_id: int) -> dict[str, Any]:
         """Set the status of the argument task to Resolved"""
-        return self.create_or_edit_task(task_id=task_id, params={"status": "resolved"})
+        return self.set_task_status(task_id=task_id, status=TaskStatus.resolved)
 
     def mark_task_as_in_progress(self, task_id: int) -> dict[str, Any]:
         """Set the status of the argument task to in progress"""
-        return self.create_or_edit_task(task_id=task_id, params={"status": "progress"})
+        return self.set_task_status(task_id=task_id, status=TaskStatus.progress)
 
     def add_user_to_task_subscribers(
         self, task_id: int, user_phid: str
