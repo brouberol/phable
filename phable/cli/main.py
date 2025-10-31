@@ -74,7 +74,7 @@ class AliasedCommandGroup(click.Group):
         formatter.write("\nAliases:")
         largest_alias = max(map(len, ctx.command.commands.keys()))
         total_spacing = largest_alias + 2
-        for alias_name, alias in self._aliases.items():
+        for alias_name, alias in sorted(self._aliases.items()):
             spacing = " " * (total_spacing - len(alias_name))
             formatter.write(f"\n  {alias_name}{spacing}{alias}")
 
