@@ -2,7 +2,7 @@ import click
 
 from phable.display import TaskFormat, display_task
 from phable.phabricator import PhabricatorClient
-from phable.utils import TASK_ID
+from phable.task import TASK_ID
 
 
 @click.command(name="show")

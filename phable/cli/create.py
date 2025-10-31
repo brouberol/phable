@@ -7,7 +7,8 @@ import click
 from phable.cli.show import show_task
 from phable.config import config
 from phable.phabricator import PhabricatorClient
-from phable.utils import TASK_ID, text_from_cli_arg_or_fs_or_editor
+from phable.task import TASK_ID
+from phable.utils import text_from_cli_arg_or_fs_or_editor
 
 
 @click.command(name="create")

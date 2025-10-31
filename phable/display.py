@@ -2,7 +2,7 @@ import json
 from collections.abc import Callable
 from enum import StrEnum, auto
 
-from .utils import Task
+from .task import Task
 
 
 class TaskFormat(StrEnum):

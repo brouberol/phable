@@ -5,7 +5,7 @@ import click
 from phable.cli.utils import VARIADIC, find_project_phid_by_title, project_phid_option
 from phable.config import config
 from phable.phabricator import PhabricatorClient
-from phable.utils import TASK_ID
+from phable.task import TASK_ID
 
 
 @click.command(name="move")
