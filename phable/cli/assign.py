@@ -13,6 +13,12 @@ from phable.task import TASK_ID
     required=False,
     help="The username to assign the task to. Self-assign the task if not provided.",
 )
+@click.option(
+    "--secondary",
+    is_flag=True,
+    default=False,
+    help="Assign the user as a secondary owner",
+)
 @click.argument("task-ids", type=TASK_ID, nargs=VARIADIC, required=True)
 @click.pass_context
 @click.pass_obj
@@ -21,6 +27,7 @@ def assign_task(
     ctx: click.Context,
     task_ids: list[int],
     username: Optional[str],
+    secondary: bool = False,
 ):
     """Assign one or multiple task ids to a username
 
@@ -30,8 +37,11 @@ def assign_task(
     # self assign task
     $ phable assign T123456
     \b
-    # asign to username
+    # assign to username
     $ phable assign T123456  --usernamme brouberol
+    \b
+    # assign to a secondary owner
+    $ phable assign T123456  --usernamme brouberol --secondary
 
     """
     if not username:
@@ -41,4 +51,6 @@ def assign_task(
         if not user:
             ctx.fail(f"User {username} was not found")
     for task_id in task_ids:
-        client.assign_task_to_user(task_id=task_id, user_phid=user["phid"])
+        client.assign_task_to_user(
+            task_id=task_id, user_phid=user["phid"], secondary=secondary
+        )

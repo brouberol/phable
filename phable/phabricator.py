@@ -256,9 +256,13 @@ class PhabricatorClient:
         )["result"]["data"]
         return self._first(user)
 
-    def assign_task_to_user(self, task_id: int, user_phid: str) -> dict[str, Any]:
+    def assign_task_to_user(
+        self, task_id: int, user_phid: str, secondary: bool = False
+    ) -> dict[str, Any]:
         """Set the owner of the argument task to the argument user id"""
-        return self.create_or_edit_task(task_id=task_id, params={"owner": user_phid})
+        field = "custom.train.backup" if secondary else "owner"
+        value = [user_phid] if secondary else user_phid
+        return self.create_or_edit_task(task_id=task_id, params={field: value})
 
     def assign_tag_to_task(self, task_id: int, tag_phid: str) -> dict[str, Any]:
         """Set the owner of the argument task to the argument user id"""
