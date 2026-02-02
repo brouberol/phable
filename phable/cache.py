@@ -1,6 +1,7 @@
 import inspect
 import json
 import os
+import getpass
 import sys
 import tempfile
 import time
@@ -12,7 +13,7 @@ if not os.getenv("GITHUB_ACTIONS"):
     CACHE_HOME_PER_PLATFORM = {
         "darwin": Path.home() / "Library" / "Caches",
         "linux": Path(os.getenv("XDG_CACHE_HOME", f"{Path.home()}/.config")),
-        "windows": Path("c:/", "Users", os.getlogin(), "AppData", "Local", "Temp"),
+        "windows": Path("c:/", "Users", getpass.getuser(), "AppData", "Local", "Temp"),
     }
 else:
     CACHE_HOME_PER_PLATFORM = {}
@@ -27,7 +28,8 @@ class Cache:
         )
         self.cache_dir = cache_parent_dir / "phind"
         if not self.cache_dir.exists():
-            self.cache_dir.mkdir()
+            # create entire path if it doesn't exist
+            os.makedirs(self.cache_dir, exist_ok=True)
         self.cache_filepath = self.cache_dir / "cache.json"
         if self.cache_filepath.exists():
             try:
