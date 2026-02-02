@@ -1,4 +1,5 @@
 import os
+import getpass
 import sys
 from configparser import ConfigParser
 from dataclasses import dataclass, field
@@ -11,7 +12,7 @@ _warnings = []
 CONFIG_HOME_PER_PLATFORM = {
     "darwin": Path.home() / "Library" / "Preferences",
     "linux": Path(os.getenv("XDG_CACHE_HOME", f"{Path.home()}/.config")),
-    "windows": Path("c:/", "Users", os.getlogin(), "AppData", "Local", "Programs"),
+    "windows": Path("c:/", "Users", getpass.getuser(), "AppData", "Local", "Programs"),
 }
 config_filepath = CONFIG_HOME_PER_PLATFORM[sys.platform] / "phable" / "config.ini"
 
