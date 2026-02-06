@@ -42,6 +42,9 @@ def assign_task(
     \b
     # assign to a secondary owner
     $ phable assign T123456  --usernamme brouberol --secondary
+    \b
+    # assign  multiple tasks to username
+    $ phable assign T123456 T234567 --usernamme brouberol
 
     """
     if not username:
