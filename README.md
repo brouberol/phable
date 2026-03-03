@@ -83,7 +83,7 @@ $ phable config aliases list
 done = move --column 'Done' --milestone
 review = move --column 'Needs Review' --milestone
 wip = move --column 'In Progress' --milestone
-team-report = list --owner brouberol --column 'In Progress' --column 'Needs Review' --column 'Blocked/Waiting' --column Done --milestone --format html
+team-report = list --owner self --column 'In Progress' --column 'Needs Review' --column 'Blocked/Waiting' --column Done --milestone --format html
 ```
 
 ### Phabricator task IDs as clickable links in iTerm2

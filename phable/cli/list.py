@@ -60,6 +60,9 @@ def list_tasks(
     \b
     # List all tasks owner by brouberol in the Done column of the default board latest milestone
     $ phable list --milestone --owner brouberol --column Done
+    \b
+    # List all tasks owner by the current user in the Done column of the default board latest milestone
+    $ phable list --milestone --owner self --column Done
 
     """
     if owner:

@@ -78,6 +78,9 @@ def create_task(
     # Create a task with an associated owner
     $ phable create --title 'A task' --owner brouberol
     \b
+    # Create a task with an associated owner set to the current user
+    $ phable create --title 'A task' --owner self
+    \b
     # Create a task with an associated subscriber
     $ phable create --title 'A task' --cc brouberol
 

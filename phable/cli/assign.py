@@ -38,16 +38,16 @@ def assign_task(
     $ phable assign T123456
     \b
     # assign to username
-    $ phable assign T123456  --usernamme brouberol
+    $ phable assign T123456 --username brouberol
     \b
-    # assign to a secondary owner
-    $ phable assign T123456  --usernamme brouberol --secondary
+    # assign current user as a secondary owner
+    $ phable assign T123456 --username self --secondary
     \b
-    # assign  multiple tasks to username
-    $ phable assign T123456 T234567 --usernamme brouberol
+    # assign multiple tasks to current user
+    $ phable assign T123456 T234567 --usernamme self
 
     """
-    if not username:
+    if not username or (username == "self"):
         user = client.current_user()
     else:
         user = client.find_user_by_username(username)
