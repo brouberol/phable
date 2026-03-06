@@ -31,6 +31,12 @@ from phable.phabricator import PhabricatorClient
     ),
 )
 @click.option(
+    "--status",
+    required=False,
+    type=click.Choice(TaskStatus._member_names_), help="Task(s) status",
+    multiple=True,
+)
+@click.option(
     "--format",
     required=False,
     type=click.Choice(TaskFormat, case_sensitive=False),
@@ -46,6 +52,7 @@ def list_tasks(
     project: Optional[str],
     owner: Optional[str] = None,
     milestone: bool = False,
+    status: list[str] = None,
     format: TaskFormat = TaskFormat.PLAIN,
 ):
     """Lists and filter tasks
@@ -88,12 +95,16 @@ def list_tasks(
     else:
         column_phids = []
     tasks = client.find_tasks(
-        column_phids=column_phids, owner_phid=owner_user, project_phid=project_phid
+        column_phids=column_phids,
+        owner_phid=owner_user,
+        project_phid=project_phid,
+        status=status,
     )
     tasks += client.find_tasks(
         column_phids=column_phids,
         backup_owner_phid=owner_user,
         project_phid=project_phid,
+        status=status,
     )
     tasks = [client.enrich_task(task) for task in tasks]
     display_tasks(tasks=tasks, format=format)
