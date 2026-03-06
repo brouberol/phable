@@ -11,6 +11,8 @@ class TaskFormat(StrEnum):
     HTML = auto()
     MARKDOWN = auto()
     WIKITEXT = auto()
+    ONELINE = auto()
+    IDS = auto()
 
 
 def display_tasks(
@@ -34,7 +36,8 @@ class TaskPrinter:
         pass
 
     def print_list(self, tasks: list[dict]) -> None:
-        pass
+        for task in tasks:
+            self.print(task)
 
     def title(self, task: dict) -> str:
         return f"{Task.from_int(task['id'])} {task['fields']['name']}"
@@ -55,18 +58,10 @@ class MarkdownTaskPrinter(TaskPrinter):
     def print(self, task: dict) -> None:
         self._printer(f"* [{self.title(task)}]({task['url']}) {self.status(task)}")
 
-    def print_list(self, tasks: list[dict]) -> None:
-        for task in tasks:
-            self.print(task)
-
 
 class WikitextTaskPrinter(TaskPrinter):
     def print(self, task: dict) -> None:
         self._printer(f"* [{task['url']} {self.title(task)}] {self.status(task)}")
-
-    def print_list(self, tasks: list[dict]) -> None:
-        for task in tasks:
-            self.print(task)
 
 
 class HtmlTaskPrinter(TaskPrinter):
@@ -112,6 +107,25 @@ class PlainTaskPrinter(TaskPrinter):
             self._printer("=" * 50)
 
 
+class OneLineTaskPrinter(TaskPrinter):
+    def print(self, task: dict) -> None:
+        self._printer(
+            " ".join(
+                [
+                    f"{Task.from_int(task['id'])}",
+                    f"{task['fields']['status']['name']:<12}",
+                    f"{task['fields']['priority']['name']:<12}",
+                    task["fields"]["name"],
+                ]
+            )
+        )
+
+
+class IdsTaskPrinter(TaskPrinter):
+    def print(self, task: dict) -> None:
+        self._printer(f"{Task.from_int(task['id'])}")
+
+
 def get_printer(format: TaskFormat) -> TaskPrinter:
     if format == TaskFormat.PLAIN:
         return PlainTaskPrinter(print)
@@ -123,5 +137,9 @@ def get_printer(format: TaskFormat) -> TaskPrinter:
         return MarkdownTaskPrinter(print)
     elif format == TaskFormat.WIKITEXT:
         return WikitextTaskPrinter(print)
+    elif format == TaskFormat.ONELINE:
+        return OneLineTaskPrinter(print)
+    elif format == TaskFormat.IDS:
+        return IdsTaskPrinter(print)
     else:
         raise ValueError(f"Unknown format: {format}")

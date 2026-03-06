@@ -30,3 +30,13 @@ class TaskStatus(StrEnum):
     stalled = "stalled"
     invalid = "invalid"
     declined = "declined"
+
+
+# TODO these are hard-coded for Wikimedia's Phab, we should do something better
+class TaskPriority(StrEnum):
+    lowest = "lowest"
+    low = "low"
+    medium = "medium"
+    high = "high"
+    unbreak = "unbreak"
+    triage = "triage"
