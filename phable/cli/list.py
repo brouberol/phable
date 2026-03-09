@@ -101,5 +101,11 @@ def list_tasks(
         project_phid=project_phid,
         status=status,
     )
+    tasks += client.find_tasks(
+        column_phids=column_phids,
+        backup_owner_phid=owner_user,
+        project_phid=project_phid,
+        status=status,
+    )
     tasks = [client.enrich_task(task) for task in tasks]
     display_tasks(tasks=tasks, format=format)
