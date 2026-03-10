@@ -30,3 +30,4 @@ class TaskStatus(StrEnum):
     stalled = "stalled"
     invalid = "invalid"
     declined = "declined"
+    duplicate = "duplicate"

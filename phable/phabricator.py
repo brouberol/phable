@@ -173,14 +173,17 @@ class PhabricatorClient:
         owner_phid: Optional[str] = None,
         backup_owner_phid: Optional[str] = None,
         project_phid: Optional[str] = None,
+        statuses: Optional[list[str]] = None,
     ) -> list[dict[str, Any]]:
         params = {
             "attachments[subscribers]": "true",
             "attachments[projects]": "true",
             "attachments[columns]": "true",
         }
-        for i, column_phid in enumerate(column_phids):
+        for i, column_phid in enumerate(column_phids or []):
             params[f"constraints[columnPHIDs][{i}]"] = column_phid
+        for i, status in enumerate(statuses or []):
+            params[f"constraints[statuses][{i}]"] = status
         if owner_phid:
             params["constraints[assigned][0]"] = owner_phid
         elif backup_owner_phid:

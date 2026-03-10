@@ -18,7 +18,7 @@ def display_tasks(
     format: TaskFormat,
 ) -> None:
     if len(tasks) == 1:
-        display_task(tasks[0], format=format)
+        return display_task(tasks[0], format=format)
     get_printer(format).print_list(tasks)
 
 
