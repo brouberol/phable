@@ -30,6 +30,7 @@ class TaskStatus(StrEnum):
     stalled = "stalled"
     invalid = "invalid"
     declined = "declined"
+    duplicate = "duplicate"
 
 
 # TODO these are hard-coded for Wikimedia's Phab, we should do something better

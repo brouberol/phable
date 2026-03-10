@@ -51,11 +51,11 @@ from phable.task import TaskStatus
 def list_tasks(
     client: PhabricatorClient,
     ctx: click.Context,
-    columns: list[str],
+    columns: tuple[str],
     project: Optional[str],
     owner: Optional[str] = None,
     milestone: bool = False,
-    status: list[str] | None = None,
+    status: tuple[str] | None = None,
     format: TaskFormat = TaskFormat.plain,
 ):
     """Lists and filter tasks
@@ -65,8 +65,8 @@ def list_tasks(
     # List all tasks in the default board
     $ phable list
     \b
-    # List all tasks in the default board latest milestone
-    $ phable list --milestone
+    # List all open tasks in the default board latest milestone
+    $ phable list --milestone --status open
     \b
     # List all tasks owner by brouberol in the Done column of the default board latest milestone
     $ phable list --milestone --owner brouberol --column Done
@@ -102,13 +102,14 @@ def list_tasks(
         column_phids=column_phids,
         owner_phid=owner_user,
         project_phid=project_phid,
-        status=status,
+        status=list(status) if status else None,
     )
-    tasks += client.find_tasks(
-        column_phids=column_phids,
-        backup_owner_phid=owner_user,
-        project_phid=project_phid,
-        status=status,
-    )
+    if owner_user:
+        tasks += client.find_tasks(
+            column_phids=column_phids,
+            backup_owner_phid=owner_user,
+            project_phid=project_phid,
+            status=list(status) if status else None,
+        )
     tasks = [client.enrich_task(task) for task in tasks]
     display_tasks(tasks=tasks, format=format)

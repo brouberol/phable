@@ -184,15 +184,14 @@ class PhabricatorClient:
         column_phids = column_phids or []
         for i, column_phid in enumerate(column_phids):
             params[f"constraints[columnPHIDs][{i}]"] = column_phid
+        for i, status_name in enumerate(status or []):
+            params[f"constraints[statuses][{i}]"] = status_name
         if owner_phid:
             params["constraints[assigned][0]"] = owner_phid
         elif backup_owner_phid:
             params["constraints[custom.train.backup][0]"] = backup_owner_phid
         if project_phid:
             params["constraints[projects][0]"] = project_phid
-        if status:
-            for i, value in enumerate(status):
-                params[f"constraints[statuses][{i}]"] = value
         return self._make_request("maniphest.search", params=params)["result"]["data"]
 
     def find_subtasks(self, parent_id: int) -> list[dict[str, Any]]:
