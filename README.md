@@ -46,6 +46,15 @@ Commands:
   tag                Add a tag on one or multiple tasks [DEPRECATED]
 ```
 
+A few examples:
+
+```console
+$ phable list --status open
+$ phable list --status progress --status stalled --milestone
+```
+
+`--status` can be passed multiple times to match several statuses.
+
 ## Setup
 
 For `phable` to work, you need to define the following configuration, by running `$EDITOR $(phable config show)`:
