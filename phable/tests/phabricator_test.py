@@ -23,6 +23,66 @@ def test_show_task(simple_task_response):
 
 
 @responses.activate
+def test_find_tasks_in_project_columns(project_columns_response, tasks_in_column_response):
+    responses.add(
+        responses.Response(
+            method="POST",
+            url=base_url + "api/project.column.search",
+            json=project_columns_response,
+        )
+    )
+    # With no ignored columns, find_tasks is called once per column (Backlog, In Progress, Done, Reported)
+    for _ in range(4):
+        responses.add(
+            responses.Response(
+                method="POST",
+                url=base_url + "api/maniphest.search",
+                json=tasks_in_column_response,
+            )
+        )
+
+    client = PhabricatorClient(base_url, token)
+    results = client.find_tasks_in_project_columns("PHID-PROJ-nk6fdveuzkehlysztapo")
+
+    # 4 columns × 1 task each = 4 (task, column_phid) pairs
+    assert len(results) == 4
+    for task, column_phid in results:
+        assert task["type"] == "TASK"
+        assert column_phid in {"PHID-PCOL-backlog", "PHID-PCOL-inprogress", "PHID-PCOL-done", "PHID-PCOL-reported"}
+
+
+@responses.activate
+def test_find_tasks_in_project_columns_with_ignored(project_columns_response, tasks_in_column_response):
+    responses.add(
+        responses.Response(
+            method="POST",
+            url=base_url + "api/project.column.search",
+            json=project_columns_response,
+        )
+    )
+    # Ignoring "Done" and "Reported": only Backlog and In Progress remain
+    for _ in range(2):
+        responses.add(
+            responses.Response(
+                method="POST",
+                url=base_url + "api/maniphest.search",
+                json=tasks_in_column_response,
+            )
+        )
+
+    client = PhabricatorClient(base_url, token)
+    # Use a different PHID to avoid cache hit from the previous test
+    results = client.find_tasks_in_project_columns(
+        "PHID-PROJ-azari57v5wl2i2koshdl",
+        ignored_columns=("Done", "Reported"),
+    )
+
+    assert len(results) == 2
+    for _, column_phid in results:
+        assert column_phid in {"PHID-PCOL-backlog", "PHID-PCOL-inprogress"}
+
+
+@responses.activate
 def test_find_milestones_for_project(milestones_response):
     responses.add(
         responses.Response(
@@ -34,7 +94,7 @@ def test_find_milestones_for_project(milestones_response):
 
     client = PhabricatorClient(base_url, token)
 
-    milestones = client.find_milestones_for_project("PHID-PROJ-r456pnp5exj6uphuhwy6")
+    milestones = client.find_milestones_for_project("PHID-PROJ-milestone1")
     assert len(milestones) == 3
     # Verify results are sorted by milestone sequence number
     assert [m["fields"]["milestone"] for m in milestones] == [35, 36, 37]

@@ -344,6 +344,31 @@ class PhabricatorClient:
             )
         return column_phid
 
+    def find_tasks_in_project_columns(
+        self,
+        project_phid: str,
+        ignored_columns: tuple[str, ...] = (),
+    ) -> list[tuple[dict[str, Any], str]]:
+        """Return (task, column_phid) pairs for all tasks in the project's non-ignored columns.
+
+        Columns whose names match an entry in ignored_columns (case-insensitive) are skipped.
+        """
+        ignored_lower = {c.lower() for c in ignored_columns}
+
+        columns = self.list_project_columns(project_phid)
+        active_columns = [
+            col for col in columns
+            if col["fields"]["name"].lower() not in ignored_lower
+        ]
+
+        result = []
+        for column in active_columns:
+            column_phid = column["phid"]
+            tasks = self.find_tasks(column_phids=[column_phid])
+            for task in tasks:
+                result.append((task, column_phid))
+        return result
+
     def find_milestones_for_project(
         self, parent_phid: str, status: str = "all"
     ) -> list[dict[str, Any]]:
