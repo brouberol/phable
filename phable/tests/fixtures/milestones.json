@@ -1,0 +1,140 @@
+{
+  "result": {
+    "data": [
+      {
+        "id": 8465,
+        "type": "PROJ",
+        "phid": "PHID-PROJ-milestone1",
+        "fields": {
+          "name": "Milestone 1",
+          "slug": null,
+          "subtype": "default",
+          "milestone": 35,
+          "depth": 1,
+          "parent": {
+            "id": 6524,
+            "phid": "PHID-PROJ-main-project",
+            "name": "Data-Platform-SRE"
+          },
+          "icon": {
+            "key": "milestone",
+            "name": "Milestone",
+            "icon": "fa-map-marker"
+          },
+          "color": {
+            "key": "violet",
+            "name": "Violet"
+          },
+          "status": "archived",
+          "spacePHID": "PHID-SPCE-6l6g5p53yi3mypnlpxjw",
+          "dateCreated": 1769162436,
+          "dateModified": 1771255757,
+          "policy": {
+            "view": "public",
+            "edit": "PHID-PLCY-gsth6m2as2637wjel4ti",
+            "join": "users"
+          },
+          "description": "Milestone for DPE SRE",
+          "custom.custom:repository": null,
+          "custom.sprint:start": null,
+          "custom.sprint:end": null
+        },
+        "attachments": {}
+      },
+      {
+        "id": 8520,
+        "type": "PROJ",
+        "phid": "PHID-PROJ-milestone2",
+        "fields": {
+          "name": "Milestone 2",
+          "slug": null,
+          "subtype": "default",
+          "milestone": 36,
+          "depth": 1,
+          "parent": {
+            "id": 6524,
+            "phid": "PHID-PROJ-main-project",
+            "name": "Data-Platform-SRE"
+          },
+          "icon": {
+            "key": "milestone",
+            "name": "Milestone",
+            "icon": "fa-map-marker"
+          },
+          "color": {
+            "key": "violet",
+            "name": "Violet"
+          },
+          "status": "archived",
+          "spacePHID": "PHID-SPCE-6l6g5p53yi3mypnlpxjw",
+          "dateCreated": 1771254097,
+          "dateModified": 1772805486,
+          "policy": {
+            "view": "public",
+            "edit": "PHID-PLCY-gsth6m2as2637wjel4ti",
+            "join": "users"
+          },
+          "description": "Milestone for DPE SRE",
+          "custom.custom:repository": null,
+          "custom.sprint:start": null,
+          "custom.sprint:end": null
+        },
+        "attachments": {}
+      },
+      {
+        "id": 8569,
+        "type": "PROJ",
+        "phid": "PHID-PROJ-milestone3",
+        "fields": {
+          "name": "Milestone 3",
+          "slug": null,
+          "subtype": "default",
+          "milestone": 37,
+          "depth": 1,
+          "parent": {
+            "id": 6524,
+            "phid": "PHID-PROJ-main-project",
+            "name": "Data-Platform-SRE"
+          },
+          "icon": {
+            "key": "milestone",
+            "name": "Milestone",
+            "icon": "fa-map-marker"
+          },
+          "color": {
+            "key": "violet",
+            "name": "Violet"
+          },
+          "status": "active",
+          "spacePHID": "PHID-SPCE-6l6g5p53yi3mypnlpxjw",
+          "dateCreated": 1772805534,
+          "dateModified": 1772805578,
+          "policy": {
+            "view": "public",
+            "edit": "PHID-PLCY-gsth6m2as2637wjel4ti",
+            "join": "users"
+          },
+          "description": "Milestone for DPE SRE",
+          "custom.custom:repository": null,
+          "custom.sprint:start": null,
+          "custom.sprint:end": null
+        },
+        "attachments": {}
+      }
+    ],
+    "maps": {
+      "slugMap": {}
+    },
+    "query": {
+      "queryKey": null
+    },
+    "cursor": {
+      "limit": 100,
+      "after": null,
+      "before": null,
+      "order": null
+    }
+  },
+  "error_code": null,
+  "error_info": null
+}
