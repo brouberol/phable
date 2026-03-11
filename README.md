@@ -39,10 +39,11 @@ Commands:
   move               Move one or several task on their current project board
   parent             Manage task parents
   report-done-tasks  Print the details of all tasks in the `from` column and move them to the `to` column.
+  set                Set the fields of one or multiple tasks
   show               Show task details
-  status             Set the status of one or multiple tasks
+  status             Set the status of one or multiple tasks [DEPRECATED]
   subscribe          Subscribe to one or multiple task ids
-  tag                Add a tag on one or multiple tasks
+  tag                Add a tag on one or multiple tasks [DEPRECATED]
 ```
 
 ## Setup
