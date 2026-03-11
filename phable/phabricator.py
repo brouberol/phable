@@ -353,6 +353,20 @@ class PhabricatorClient:
             )
         return column_phid
 
+    def find_milestones_for_project(
+        self, parent_phid: str, status: str = "all"
+    ) -> list[dict[str, Any]]:
+        """Return all milestones for the given parent project, ordered by milestone sequence number."""
+        milestones = self._make_request(
+            "project.search",
+            params={
+                "constraints[isMilestone]": "true",
+                "constraints[parents][0]": parent_phid,
+                "constraints[status]": status,
+            },
+        )["result"]["data"]
+        return sorted(milestones, key=lambda m: m["fields"]["milestone"])
+
     @cached
     def find_project_by_title(
         self, title: str, parent_phid: Optional[str] = None

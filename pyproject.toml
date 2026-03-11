@@ -22,15 +22,15 @@ ruff = "^0.15.7"
 mypy = "^1.19.1"
 types-requests = "^2.32.4.20260107"
 
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
-
 [tool.pytest.ini_options]
-addopts = "-v -m 'not integration'"
+addopts = "-m 'not integration'"
 markers = [
     "integration: marks tests as integration tests requiring a live Phabricator instance (run with: pytest -m integration)",
 ]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
 
 [tool.mypy]
 exclude = [
