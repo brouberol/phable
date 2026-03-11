@@ -12,7 +12,7 @@ from phable.task import TASK_ID
 @click.argument("task-ids", type=TASK_ID, nargs=VARIADIC)
 @click.pass_obj
 def tag_task(client: PhabricatorClient, task_ids: list[int], tag: Optional[str]):
-    """Add a tag on one or multiple tasks
+    """Add a tag on one or multiple tasks [DEPRECATED]
 
     \b
     Example:
@@ -20,6 +20,10 @@ def tag_task(client: PhabricatorClient, task_ids: list[int], tag: Optional[str])
     $ phable tag T123456 T123457 --tag 'Essential work'  # add multiple tags to a task
 
     """
+    click.secho(
+        "[DEPRECATION NOTICE] This command has been replaced by `phable set --tag` and will soon be removed",
+        fg="yellow",
+    )
     if tag := client.find_project_by_title(title=tag):
         for task_id in task_ids:
             client.assign_tag_to_task(task_id=task_id, tag_phid=tag["phid"])
