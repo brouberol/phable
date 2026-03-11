@@ -1,0 +1,63 @@
+{
+  "result": {
+    "data": [
+      {
+        "id": 100001,
+        "type": "TASK",
+        "phid": "PHID-TASK-aaaaaaaaaaaaaaaaaaa1",
+        "fields": {
+          "name": "Task in column",
+          "status": {
+            "value": "open",
+            "name": "Open",
+            "color": null
+          },
+          "authorPHID": "PHID-USER-wniuzmzvlcmyao2o72qy",
+          "ownerPHID": null,
+          "dateCreated": 1772805534,
+          "dateModified": 1772805534,
+          "policy": {
+            "view": "public",
+            "interact": "public",
+            "edit": "users"
+          }
+        },
+        "attachments": {
+          "subscribers": {
+            "subscriberPHIDs": [],
+            "subscriberCount": 0,
+            "viewerIsSubscribed": false
+          },
+          "projects": {
+            "projectPHIDs": ["PHID-PROJ-nk6fdveuzkehlysztapo"]
+          },
+          "columns": {
+            "boards": {
+              "PHID-PROJ-nk6fdveuzkehlysztapo": {
+                "columns": [
+                  {
+                    "id": 1001,
+                    "phid": "PHID-PCOL-backlog",
+                    "name": "Backlog"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    ],
+    "maps": {},
+    "query": {
+      "queryKey": null
+    },
+    "cursor": {
+      "limit": 100,
+      "after": null,
+      "before": null,
+      "order": null
+    }
+  },
+  "error_code": null,
+  "error_info": null
+}
