@@ -23,6 +23,124 @@ def test_show_task(simple_task_response):
 
 
 @responses.activate
+def test_validate_and_build_column_map(project_columns_response, target_project_columns_response):
+    # Source columns fetched first, then target columns
+    responses.add(
+        responses.Response(
+            method="POST",
+            url=base_url + "api/project.column.search",
+            json=project_columns_response,
+        )
+    )
+    responses.add(
+        responses.Response(
+            method="POST",
+            url=base_url + "api/project.column.search",
+            json=target_project_columns_response,
+        )
+    )
+
+    client = PhabricatorClient(base_url, token)
+    column_map = client.validate_and_build_column_map(
+        source_phid="PHID-PROJ-source",
+        target_phid="PHID-PROJ-target",
+    )
+
+    assert column_map == {
+        "PHID-PCOL-backlog": "PHID-PCOL-target-backlog",
+        "PHID-PCOL-inprogress": "PHID-PCOL-target-inprogress",
+        "PHID-PCOL-done": "PHID-PCOL-target-done",
+        "PHID-PCOL-reported": "PHID-PCOL-target-reported",
+    }
+
+
+@responses.activate
+def test_validate_and_build_column_map_with_ignored(project_columns_response, target_project_columns_response):
+    responses.add(
+        responses.Response(
+            method="POST",
+            url=base_url + "api/project.column.search",
+            json=project_columns_response,
+        )
+    )
+    responses.add(
+        responses.Response(
+            method="POST",
+            url=base_url + "api/project.column.search",
+            json=target_project_columns_response,
+        )
+    )
+
+    client = PhabricatorClient(base_url, token)
+    column_map = client.validate_and_build_column_map(
+        source_phid="PHID-PROJ-source2",
+        target_phid="PHID-PROJ-target2",
+        ignored_columns=("Reported",),
+    )
+
+    # "Reported" excluded from the map
+    assert "PHID-PCOL-reported" not in column_map
+    assert column_map == {
+        "PHID-PCOL-backlog": "PHID-PCOL-target-backlog",
+        "PHID-PCOL-inprogress": "PHID-PCOL-target-inprogress",
+        "PHID-PCOL-done": "PHID-PCOL-target-done",
+    }
+
+
+@responses.activate
+def test_validate_and_build_column_map_missing_column(project_columns_response):
+    # Target is missing "In Progress" and "Done"
+    target_with_missing = {
+        "result": {
+            "data": [
+                {
+                    "id": 2001,
+                    "type": "PCOL",
+                    "phid": "PHID-PCOL-target-backlog",
+                    "fields": {"name": "Backlog", "proxyPHID": None, "isHidden": False},
+                },
+                {
+                    "id": 2004,
+                    "type": "PCOL",
+                    "phid": "PHID-PCOL-target-reported",
+                    "fields": {"name": "Reported", "proxyPHID": None, "isHidden": False},
+                },
+            ],
+            "maps": {},
+            "query": {"queryKey": None},
+            "cursor": {"limit": 100, "after": None, "before": None, "order": None},
+        },
+        "error_code": None,
+        "error_info": None,
+    }
+    responses.add(
+        responses.Response(
+            method="POST",
+            url=base_url + "api/project.column.search",
+            json=project_columns_response,
+        )
+    )
+    responses.add(
+        responses.Response(
+            method="POST",
+            url=base_url + "api/project.column.search",
+            json=target_with_missing,
+        )
+    )
+
+    client = PhabricatorClient(base_url, token)
+    try:
+        client.validate_and_build_column_map(
+            source_phid="PHID-PROJ-source3",
+            target_phid="PHID-PROJ-target3",
+        )
+        assert False, "Expected ValueError"
+    except ValueError as e:
+        assert "In Progress" in str(e)
+        assert "Done" in str(e)
+
+
+@responses.activate
 def test_find_tasks_in_project_columns(project_columns_response, tasks_in_column_response):
     responses.add(
         responses.Response(
