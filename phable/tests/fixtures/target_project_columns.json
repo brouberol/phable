@@ -1,0 +1,86 @@
+{
+  "result": {
+    "data": [
+      {
+        "id": 2001,
+        "type": "PCOL",
+        "phid": "PHID-PCOL-target-backlog",
+        "fields": {
+          "name": "Backlog",
+          "proxyPHID": null,
+          "isHidden": false,
+          "isDefaultColumn": false,
+          "dateCreated": 1772805534,
+          "dateModified": 1772805534,
+          "policy": {
+            "view": "public",
+            "edit": "users"
+          }
+        }
+      },
+      {
+        "id": 2002,
+        "type": "PCOL",
+        "phid": "PHID-PCOL-target-inprogress",
+        "fields": {
+          "name": "In Progress",
+          "proxyPHID": null,
+          "isHidden": false,
+          "isDefaultColumn": false,
+          "dateCreated": 1772805534,
+          "dateModified": 1772805534,
+          "policy": {
+            "view": "public",
+            "edit": "users"
+          }
+        }
+      },
+      {
+        "id": 2003,
+        "type": "PCOL",
+        "phid": "PHID-PCOL-target-done",
+        "fields": {
+          "name": "Done",
+          "proxyPHID": null,
+          "isHidden": false,
+          "isDefaultColumn": false,
+          "dateCreated": 1772805534,
+          "dateModified": 1772805534,
+          "policy": {
+            "view": "public",
+            "edit": "users"
+          }
+        }
+      },
+      {
+        "id": 2004,
+        "type": "PCOL",
+        "phid": "PHID-PCOL-target-reported",
+        "fields": {
+          "name": "Reported",
+          "proxyPHID": null,
+          "isHidden": false,
+          "isDefaultColumn": false,
+          "dateCreated": 1772805534,
+          "dateModified": 1772805534,
+          "policy": {
+            "view": "public",
+            "edit": "users"
+          }
+        }
+      }
+    ],
+    "maps": {},
+    "query": {
+      "queryKey": null
+    },
+    "cursor": {
+      "limit": 100,
+      "after": null,
+      "before": null,
+      "order": null
+    }
+  },
+  "error_code": null,
+  "error_info": null
+}
