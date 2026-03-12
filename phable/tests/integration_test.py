@@ -34,6 +34,30 @@ def test_find_tasks_in_project_columns(client):
 
 
 @pytest.mark.integration
+def test_validate_and_build_column_map(client):
+    milestones = client.find_milestones_for_project(
+        parent_phid=config.phabricator_default_project_phid
+    )
+    assert len(milestones) >= 2, "Need at least 2 milestones to compare"
+
+    previous, current = milestones[-2], milestones[-1]
+    print(f"\nComparing columns between '{previous['fields']['name']}' and '{current['fields']['name']}'")
+
+    column_map = client.validate_and_build_column_map(
+        source_phid=previous["phid"],
+        target_phid=current["phid"],
+    )
+
+    pprint.pprint(column_map)
+
+    assert len(column_map) > 0
+    for source_phid, target_phid in column_map.items():
+        assert source_phid.startswith("PHID-PCOL-")
+        assert target_phid.startswith("PHID-PCOL-")
+        assert source_phid != target_phid
+
+
+@pytest.mark.integration
 def test_find_milestones_for_project(client):
     milestones = client.find_milestones_for_project(
         parent_phid=config.phabricator_default_project_phid
