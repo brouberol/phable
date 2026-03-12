@@ -348,6 +348,108 @@ class PhabricatorClient:
             )
         return column_phid
 
+    def validate_and_build_column_map(
+        self,
+        source_phid: str,
+        target_phid: str,
+        ignored_columns: tuple[str, ...] = (),
+    ) -> dict[str, str]:
+        """Build a mapping of source column PHIDs to target column PHIDs, matched by name.
+
+        Columns whose names match an entry in ignored_columns (case-insensitive) are excluded
+        from the mapping.
+
+        :raises ValueError listing all source columns missing from the target, so the caller
+                can fail before touching any task.
+        """
+        ignored_lower = {c.lower() for c in ignored_columns}
+
+        source_columns = [
+            col for col in self.list_project_columns(source_phid)
+            if col["fields"]["name"].lower() not in ignored_lower
+        ]
+        target_by_name = {
+            col["fields"]["name"].lower(): col["phid"]
+            for col in self.list_project_columns(target_phid)
+        }
+
+        missing = [
+            col["fields"]["name"]
+            for col in source_columns
+            if col["fields"]["name"].lower() not in target_by_name
+        ]
+        if missing:
+            raise ValueError(
+                f"The following columns are present in the source but missing from the target: "
+                f"{', '.join(missing)}"
+            )
+
+        return {
+            col["phid"]: target_by_name[col["fields"]["name"].lower()]
+            for col in source_columns
+        }
+
+    def move_tasks_to_milestone(
+        self,
+        source_phid: str,
+        target_phid: str,
+        ignored_columns: tuple[str, ...] = (),
+    ) -> list[dict[str, Any]]:
+        """Move all tasks from source project columns to the matching target project columns.
+
+        Validates that all column names match before moving any task.
+        Returns the list of moved tasks.
+        """
+        column_map = self.validate_and_build_column_map(source_phid, target_phid, ignored_columns)
+        tasks_with_columns = self.find_tasks_in_project_columns(source_phid, ignored_columns)
+
+        moved = []
+        for task, source_column_phid in tasks_with_columns:
+            target_column_phid = column_map[source_column_phid]
+            self.assign_tag_to_task(task_id=task["id"], tag_phid=target_phid)
+            self.move_task_to_column(task_id=task["id"], column_phid=target_column_phid)
+            moved.append(task)
+        return moved
+
+    def find_tasks_in_project_columns(
+        self,
+        project_phid: str,
+        ignored_columns: tuple[str, ...] = (),
+    ) -> list[tuple[dict[str, Any], str]]:
+        """Return (task, column_phid) pairs for all tasks in the project's non-ignored columns.
+
+        Columns whose names match an entry in ignored_columns (case-insensitive) are skipped.
+        """
+        ignored_lower = {c.lower() for c in ignored_columns}
+
+        columns = self.list_project_columns(project_phid)
+        active_columns = [
+            col for col in columns
+            if col["fields"]["name"].lower() not in ignored_lower
+        ]
+
+        result = []
+        for column in active_columns:
+            column_phid = column["phid"]
+            tasks = self.find_tasks(column_phids=[column_phid])
+            for task in tasks:
+                result.append((task, column_phid))
+        return result
+
+    def find_milestones_for_project(
+        self, parent_phid: str, status: str = "all"
+    ) -> list[dict[str, Any]]:
+        """Return all milestones for the given parent project, ordered by milestone sequence number."""
+        milestones = self._make_request(
+            "project.search",
+            params={
+                "constraints[isMilestone]": "true",
+                "constraints[parents][0]": parent_phid,
+                "constraints[status]": status,
+            },
+        )["result"]["data"]
+        return sorted(milestones, key=lambda m: m["fields"]["milestone"])
+
     @cached
     def find_project_by_title(
         self, title: str, parent_phid: Optional[str] = None
