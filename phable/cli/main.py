@@ -11,6 +11,7 @@ from phable.cli.config import _config
 from phable.cli.create import create_task
 from phable.cli.list import list_tasks
 from phable.cli.move import move_task
+from phable.cli.move_project_tasks import move_project_tasks
 from phable.cli.parent import parent
 from phable.cli.report import report_done_tasks
 from phable.cli.show import show_task
@@ -95,6 +96,7 @@ cli.add_command(comment_on_task)
 cli.add_command(_config)
 cli.add_command(create_task)
 cli.add_command(move_task)
+cli.add_command(move_project_tasks)
 cli.add_command(report_done_tasks)
 cli.add_command(show_task)
 cli.add_command(subscribe_to_task)
