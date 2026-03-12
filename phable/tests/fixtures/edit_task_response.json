@@ -1,0 +1,15 @@
+{
+  "result": {
+    "object": {
+      "id": 100001,
+      "phid": "PHID-TASK-aaaaaaaaaaaaaaaaaaa1"
+    },
+    "transactions": [
+      {
+        "phid": "PHID-XACT-TASK-aaaaaaaaaaaaaaaaaa1"
+      }
+    ]
+  },
+  "error_code": null,
+  "error_info": null
+}
