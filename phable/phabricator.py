@@ -394,6 +394,30 @@ class PhabricatorClient:
             for col in source_columns
         }
 
+    def move_tasks_to_milestone(
+        self,
+        source_phid: str,
+        target_phid: str,
+        ignored_columns: tuple[str, ...] = (),
+    ) -> list[dict[str, Any]]:
+        """Move all tasks from source project columns to the matching target project columns.
+
+        Validates that all column names match before moving any task.
+        Returns the list of moved tasks.
+        Note that Phorge already enforces that a task can only be in a single milestone for a
+        given project, so no need to remove the current milestone.
+        """
+        column_map = self.validate_and_build_column_map(source_phid, target_phid, ignored_columns)
+        tasks_with_columns = self.find_tasks_in_project_columns(source_phid, ignored_columns)
+
+        moved = []
+        for task, source_column_phid in tasks_with_columns:
+            target_column_phid = column_map[source_column_phid]
+            self.assign_tag_to_task(task_id=task["id"], tag_phid=target_phid)
+            self.move_task_to_column(task_id=task["id"], column_phid=target_column_phid)
+            moved.append(task)
+        return moved
+
     def find_tasks_in_project_columns(
         self,
         project_phid: str,

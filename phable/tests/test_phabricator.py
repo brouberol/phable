@@ -60,6 +60,56 @@ def test_find_tasks_with_statuses(simple_task_response):
 
 
 @responses.activate
+def test_move_tasks_to_milestone(
+    project_columns_response, target_project_columns_response, tasks_in_column_response, edit_task_response
+):
+    # validate_and_build_column_map: source columns, then target columns
+    responses.add(responses.Response(method="POST", url=base_url + "api/project.column.search", json=project_columns_response))
+    responses.add(responses.Response(method="POST", url=base_url + "api/project.column.search", json=target_project_columns_response))
+    # find_tasks_in_project_columns: source columns cached; one maniphest.search per column (all 4, no ignored)
+    for _ in range(4):
+        responses.add(responses.Response(method="POST", url=base_url + "api/maniphest.search", json=tasks_in_column_response))
+    # per task: assign_tag_to_task + move_task_to_column = 2 × maniphest.edit per task, 4 tasks total
+    for _ in range(8):
+        responses.add(responses.Response(method="POST", url=base_url + "api/maniphest.edit", json=edit_task_response))
+
+    client = PhabricatorClient(base_url, token)
+    moved = client.move_tasks_to_milestone(
+        source_phid="PHID-PROJ-source-mv",
+        target_phid="PHID-PROJ-target-mv",
+    )
+
+    assert len(moved) == 4
+    assert all(t["type"] == "TASK" for t in moved)
+    # Verify assign + move were both called for each task (8 edit calls consumed)
+    assert len(responses.calls) == 2 + 4 + 8
+
+
+@responses.activate
+def test_move_tasks_to_milestone_with_ignored(
+    project_columns_response, target_project_columns_response, tasks_in_column_response, edit_task_response
+):
+    responses.add(responses.Response(method="POST", url=base_url + "api/project.column.search", json=project_columns_response))
+    responses.add(responses.Response(method="POST", url=base_url + "api/project.column.search", json=target_project_columns_response))
+    # 3 active columns (Reported ignored)
+    for _ in range(3):
+        responses.add(responses.Response(method="POST", url=base_url + "api/maniphest.search", json=tasks_in_column_response))
+    # 3 tasks × 2 edits each
+    for _ in range(6):
+        responses.add(responses.Response(method="POST", url=base_url + "api/maniphest.edit", json=edit_task_response))
+
+    client = PhabricatorClient(base_url, token)
+    moved = client.move_tasks_to_milestone(
+        source_phid="PHID-PROJ-source-mv2",
+        target_phid="PHID-PROJ-target-mv2",
+        ignored_columns=("Reported",),
+    )
+
+    assert len(moved) == 3
+    assert len(responses.calls) == 2 + 3 + 6
+
+
+@responses.activate
 def test_validate_and_build_column_map(project_columns_response, target_project_columns_response):
     # Source columns fetched first, then target columns
     responses.add(

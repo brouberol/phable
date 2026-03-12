@@ -27,3 +27,8 @@ def tasks_in_column_response():
 @pytest.fixture
 def target_project_columns_response():
     return json.load(open(Path(__file__).parent / Path("fixtures/target_project_columns.json")))
+
+
+@pytest.fixture
+def edit_task_response():
+    return json.load(open(Path(__file__).parent / Path("fixtures/edit_task_response.json")))
