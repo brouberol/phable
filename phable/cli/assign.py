@@ -1,5 +1,3 @@
-from typing import Optional
-
 import click
 
 from phable.cli.utils import VARIADIC
@@ -27,7 +25,7 @@ def assign_task(
     client: PhabricatorClient,
     ctx: click.Context,
     task_ids: list[int],
-    username: Optional[str],
+    username: str,
     secondary: bool = False,
 ):
     """Assign one or multiple task ids to a username
