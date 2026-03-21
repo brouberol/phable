@@ -80,7 +80,10 @@ class HtmlTaskPrinter(TaskPrinter):
 class PlainTaskPrinter(TaskPrinter):
     def print(self, task: dict) -> None:
         parent_task = task.get("parent", {})
-        parent_str = self.title(parent_task) or ""
+        if parent_task:
+            parent_str = self.title(parent_task)
+        else:
+            parent_str = ""
         print(f"URL: {task['url']}")
         print(f"Task: {Task.from_int(task['id'])}")
         print(f"Title: {task['fields']['name']}")
