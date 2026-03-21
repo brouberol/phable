@@ -130,7 +130,7 @@ _PHABLE_COMPLETE=fish_source phable | source
 ```
 
 ## Contributing
-Install all development depoendencies using
+Install all development dependencies using
 ```bash
 make init
 ```
