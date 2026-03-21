@@ -1,5 +1,5 @@
 test:
-	poetry run pytest -m 'not integration'
+	poetry run pytest
 
 ruff:
 	poetry run ruff check phable

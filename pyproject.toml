@@ -11,14 +11,13 @@ packages = [{ include = "phable" }]
 python = "^3.11"
 requests = "^2.32.3"
 click = "^8.1.8"
-pytest = "^8.3.5"
 
 [tool.poetry.scripts]
 phable = 'phable.cli.main:runcli'
 
 [tool.poetry.group.dev.dependencies]
 responses = "^0.25.7"
-pytest = "^8.3.5"
+pytest = "^9.0.0"
 ruff = "^0.15.7"
 mypy = "^1.19.1"
 types-requests = "^2.32.4.20260107"
@@ -27,8 +26,11 @@ types-requests = "^2.32.4.20260107"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.pytest]
-addopts = "-s"
+[tool.pytest.ini_options]
+addopts = "-v -m 'not integration'"
+markers = [
+    "integration: marks tests as integration tests requiring a live Phabricator instance (run with: pytest -m integration)",
+]
 
 [tool.mypy]
 exclude = [
