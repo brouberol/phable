@@ -1,5 +1,5 @@
-import os
 import getpass
+import os
 import sys
 from configparser import ConfigParser
 from dataclasses import dataclass, field
@@ -17,21 +17,23 @@ CONFIG_HOME_PER_PLATFORM = {
 config_filepath = CONFIG_HOME_PER_PLATFORM[sys.platform] / "phable" / "config.ini"
 
 
-def get_from_config_or_env(config_value: str, env_var_name: str):
+def get_from_config_or_env(config_value: str, env_var_name: str) -> str:
     config = read_config()
     if val := config.get("phabricator", {}).get(config_value):
         return val
     if val := os.getenv(env_var_name):
         return val
+    return ""
     _warnings.append(
         f"Required config {config_value} / environment variable {env_var_name} not set"
     )
 
 
-def field_with_default_from_config_then_env(config_value, env_var_name):
-    return field(
-        default_factory=partial(get_from_config_or_env, config_value, env_var_name)
-    )
+def field_with_default_from_config_then_env(
+    config_value: str, env_var_name: str
+) -> str:
+    default_factory = partial(get_from_config_or_env, config_value, env_var_name)
+    return field(default_factory=default_factory)
 
 
 @cache

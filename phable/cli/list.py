@@ -8,6 +8,7 @@ from phable.display import TaskFormat, display_tasks
 from phable.phabricator import PhabricatorClient
 from phable.task import TaskStatus
 
+
 @click.command(name="list")
 @click.option(
     "--column",
@@ -33,14 +34,15 @@ from phable.task import TaskStatus
 @click.option(
     "--status",
     required=False,
-    type=click.Choice(TaskStatus._member_names_), help="Task(s) status",
+    type=click.Choice(TaskStatus._member_names_),
+    help="Task(s) status",
     default=[TaskStatus.open, TaskStatus.progress, TaskStatus.stalled],
     multiple=True,
 )
 @click.option(
     "--format",
     required=False,
-    type=click.Choice(TaskFormat, case_sensitive=False),
+    type=click.Choice(TaskFormat._member_names_, case_sensitive=False),
     default="plain",
     help="The output format of the task list",
 )
@@ -53,7 +55,7 @@ def list_tasks(
     project: Optional[str],
     owner: Optional[str] = None,
     milestone: bool = False,
-    status: list[str] = None,
+    status: list[str] | None = None,
     format: TaskFormat = TaskFormat.PLAIN,
 ):
     """Lists and filter tasks
@@ -74,10 +76,11 @@ def list_tasks(
 
     """
     if owner:
+        owner_user = None
         if owner == "self":
             owner_user = client.current_user()["phid"]
-        else:
-            owner_user = client.find_user_by_username(owner)["phid"]
+        elif owner_user_data := client.find_user_by_username(owner):
+            owner_user = owner_user_data["phid"]
         if not owner_user:
             ctx.fail(f"User {owner} was not found")
     else:

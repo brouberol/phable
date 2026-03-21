@@ -1,11 +1,11 @@
 import os
 import subprocess
-import tempfile
 from pathlib import Path
+from typing import cast
 
 
 def text_from_cli_arg_or_fs_or_editor(
-    body_or_path: str, force_editor: bool = False
+    body: str | None = None, path: Path | None = None, force_editor: bool = False
 ) -> str:
     """Return argument text/file content, or return prompted input text.
 
@@ -15,23 +15,18 @@ def text_from_cli_arg_or_fs_or_editor(
     user.
 
     """
-    try:
-        if (
-            not force_editor
-            and body_or_path is not None
-            and (local_file := Path(body_or_path)).exists()
-        ):
-            return local_file.read_text()
-    except OSError:
-        pass
+    if not (body or path):
+        raise ValueError("Either a body or path must be specified")
 
-    if not body_or_path or force_editor:
-        txt_tmpfile = tempfile.NamedTemporaryFile(
-            encoding="utf-8", mode="w", suffix=".md"
-        )
-        if force_editor:
-            txt_tmpfile.write(body_or_path.read_text())
-            txt_tmpfile.flush()
-        subprocess.run([os.environ["EDITOR"], txt_tmpfile.name])
-        return Path(txt_tmpfile.name).read_text()
-    return body_or_path
+    if body:
+        return body
+
+    path = cast(Path, path)
+    if not path.exists():
+        raise ValueError(f"{path} does not exist")
+
+    if not force_editor:
+        return path.read_text(encoding="utf-8")
+
+    subprocess.run([os.environ["EDITOR"], path])
+    return path.read_text(encoding="utf-8")

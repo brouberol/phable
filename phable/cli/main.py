@@ -1,4 +1,5 @@
 import atexit
+from typing import cast
 
 import click
 from click import Context
@@ -74,7 +75,8 @@ class AliasedCommandGroup(click.Group):
         if not self._aliases:
             return
         formatter.write("\nAliases:")
-        largest_alias = max(map(len, ctx.command.commands.keys()))
+        command = cast(AliasedCommandGroup, ctx.command)
+        largest_alias = max(map(len, command.commands.keys()))
         total_spacing = largest_alias + 2
         for alias_name, alias in sorted(self._aliases.items()):
             spacing = " " * (total_spacing - len(alias_name))

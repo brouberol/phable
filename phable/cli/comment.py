@@ -25,5 +25,5 @@ def comment_on_task(client: PhabricatorClient, task_id: int, comment: Optional[s
     $ phable comment T123456                                # set comment body from your own text editor
 
     """
-    comment = text_from_cli_arg_or_fs_or_editor(comment)
+    comment = text_from_cli_arg_or_fs_or_editor(body=comment)
     client.create_or_edit_task(task_id=task_id, params={"comment": comment})

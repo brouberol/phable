@@ -37,15 +37,16 @@ class PhabricatorClient:
             "Content-Type": "application/x-www-form-urlencoded",
         }
 
-    def _first(self, result_set: list[T]) -> T:
+    def _first(self, result_set: list[T]) -> T | None:
         if result_set:
             return result_set[0]
+        return None
 
     def _make_request(
         self,
         path: str,
-        params: dict[str, Any] = None,
-        headers: dict[str, str] = None,
+        params: dict[str, Any] | None = None,
+        headers: dict[str, str] | None = None,
     ) -> dict[str, Any]:
         """Helper method to make API requests"""
         headers = headers or {}
@@ -85,7 +86,7 @@ class PhabricatorClient:
             else:
                 raw_params[f"transactions[{i}][value]"] = value
         if task_id:
-            raw_params["objectIdentifier"] = task_id
+            raw_params["objectIdentifier"] = str(task_id)
         return self._make_request("maniphest.edit", params=raw_params)
 
     def show_task(self, task_id: int) -> dict[str, Any]:
@@ -131,11 +132,11 @@ class PhabricatorClient:
 
     def enrich_task_with_author_owner(self, task: dict[str, Any]) -> None:
         task["author"] = self.show_user(phid=task["fields"]["authorPHID"])
+        owner_username = "Unassigned"
         if owner_id := task["fields"]["ownerPHID"]:
-            owner = self.show_user(phid=owner_id)["fields"]["username"]
-        else:
-            owner = "Unassigned"
-        task["owner"] = owner
+            if owner := self.show_user(phid=owner_id):
+                owner_username = owner["fields"]["username"]
+        task["owner"] = owner_username
 
     def enrich_task_with_tags(self, task: dict[str, Any]) -> None:
         if project_ids := task["attachments"]["projects"]["projectPHIDs"]:
@@ -156,11 +157,11 @@ class PhabricatorClient:
         if not subtasks:
             subtasks = []
         for subtask in subtasks:
+            owner_username = ""
             if subtask_owner_id := subtask["fields"]["ownerPHID"]:
-                owner = self.show_user(subtask_owner_id)["fields"]["username"]
-            else:
-                owner = ""
-            subtask["owner"] = owner
+                if owner := self.show_user(subtask_owner_id):
+                    owner_username = owner["fields"]["username"]
+            subtask["owner"] = owner_username
         task["subtasks"] = subtasks
 
     def enrich_task_with_parent(self, task: dict[str, Any]) -> None:
@@ -180,6 +181,7 @@ class PhabricatorClient:
             "attachments[projects]": "true",
             "attachments[columns]": "true",
         }
+        column_phids = column_phids or []
         for i, column_phid in enumerate(column_phids):
             params[f"constraints[columnPHIDs][{i}]"] = column_phid
         if owner_phid:
@@ -240,7 +242,7 @@ class PhabricatorClient:
         return self._first(user)
 
     @cached
-    def show_projects(self, phids: list[str]) -> dict[str, Any]:
+    def show_projects(self, phids: list[str]) -> list[dict[str, Any]]:
         """Show details of the provided Maniphest projects"""
         params = {}
         for i, phid in enumerate(phids):
@@ -306,6 +308,7 @@ class PhabricatorClient:
         for column in columns:
             if column["fields"]["proxyPHID"] and not column["fields"]["isHidden"]:
                 return column["fields"]["proxyPHID"]
+        return None
 
     def get_main_project_or_milestone(self, milestone: bool, project_phid: str) -> str:
         """Returns either the given project, or the current milestone of the given project."""
@@ -323,7 +326,10 @@ class PhabricatorClient:
         return target_project_phid
 
     def format_project_name(self, project_phid: str) -> str:
-        project = self.show_projects(phids=[project_phid])[0]
+        if projects := self.show_projects(phids=[project_phid]):
+            project = projects[0]
+        else:
+            raise ValueError(f"Project {project_phid} not found")
         if project["fields"].get("parent"):
             parent_project_name = project["fields"]["parent"]["name"]
             return f"{parent_project_name} ({project['fields']['name']})"

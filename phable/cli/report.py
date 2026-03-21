@@ -20,7 +20,7 @@ from phable.phabricator import PhabricatorClient
 )
 @click.option(
     "--format",
-    type=click.Choice(TaskFormat, case_sensitive=False),
+    type=click.Choice(TaskFormat._member_names_, case_sensitive=False),
     default="plain",
     help="Output format",
 )
@@ -43,7 +43,7 @@ def report_done_tasks(
     ctx: click.Context,
     project: Optional[str],
     milestone: bool,
-    format: str,
+    format: TaskFormat,
     source: str,
     destination: str,
 ):

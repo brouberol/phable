@@ -1,5 +1,3 @@
-from typing import Optional
-
 import click
 
 from phable.cli.utils import VARIADIC
@@ -8,10 +6,10 @@ from phable.task import TASK_ID
 
 
 @click.command(name="tag")
-@click.option("--tag", type=str, help="Tag name")
+@click.option("--tag", type=str, help="Tag name", required=True)
 @click.argument("task-ids", type=TASK_ID, nargs=VARIADIC)
 @click.pass_obj
-def tag_task(client: PhabricatorClient, task_ids: list[int], tag: Optional[str]):
+def tag_task(client: PhabricatorClient, task_ids: list[int], tag: str):
     """Add a tag on one or multiple tasks [DEPRECATED]
 
     \b
@@ -24,8 +22,8 @@ def tag_task(client: PhabricatorClient, task_ids: list[int], tag: Optional[str])
         "[DEPRECATION NOTICE] This command has been replaced by `phable set --tag` and will soon be removed",
         fg="yellow",
     )
-    if tag := client.find_project_by_title(title=tag):
+    if tag_data := client.find_project_by_title(title=tag):
         for task_id in task_ids:
-            client.assign_tag_to_task(task_id=task_id, tag_phid=tag["phid"])
+            client.assign_tag_to_task(task_id=task_id, tag_phid=tag_data["phid"])
     else:
         click.echo(f"Tag '{tag}' not found", err=True)

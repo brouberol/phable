@@ -53,6 +53,9 @@ def set_task_fields(
             ctx.fail(f"Tag '{tag}' not found")
 
     for task_id in task_ids:
-        params = {"priority": priority, "status": status}
-        params = {param: value for param, value in params.values() if value is not None}
+        params: dict[str, str] = {}
+        if priority:
+            params["priority"] = priority
+        if status:
+            params["status"] = status
         client.create_or_edit_task(task_id=task_id, params=params)

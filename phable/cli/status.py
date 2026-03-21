@@ -1,5 +1,3 @@
-from typing import Optional
-
 import click
 
 from phable.cli.utils import VARIADIC
@@ -9,13 +7,14 @@ from phable.task import TASK_ID, TaskStatus
 
 @click.command(name="status")
 @click.option(
-    "--status", type=click.Choice(TaskStatus._member_names_), help="Task(s) status"
+    "--status",
+    type=click.Choice(TaskStatus._member_names_),
+    help="Task(s) status",
+    required=True,
 )
 @click.argument("task-ids", type=TASK_ID, nargs=VARIADIC)
 @click.pass_obj
-def set_task_status(
-    client: PhabricatorClient, task_ids: list[int], status: Optional[str]
-):
+def set_task_status(client: PhabricatorClient, task_ids: list[int], status: TaskStatus):
     """Set the status of one or multiple tasks [DEPRECATED]
 
     \b

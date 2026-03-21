@@ -42,7 +42,7 @@ def create_task(
     ctx: click.Context,
     title: str,
     description: Optional[str],
-    template: Path,
+    template: Optional[Path],
     priority: str,
     parent_id: Optional[str],
     tags: list[str],
@@ -85,19 +85,21 @@ def create_task(
     $ phable create --title 'A task' --cc brouberol
 
     """
+    force_editor = False
+    body, path = None, None
     if template:
         if template.exists():
-            description = template
+            body = template.read_text()
             force_editor = True
         else:
             ctx.fail(f"Template file {template} does not exist")
-    else:
-        force_editor = False
+    elif description is not None and Path(description).exists():
+        path = Path(description)
     description = text_from_cli_arg_or_fs_or_editor(
-        description, force_editor=force_editor
+        body=body, path=path, force_editor=force_editor
     )
 
-    task_params = {
+    task_params: dict[str, str | list] = {
         "title": title,
         "description": description,
         "priority": priority,
@@ -122,11 +124,13 @@ def create_task(
                 tag_projects_phids.append(project["phid"])
             else:
                 ctx.fail(f"Project {project_title} not found")
+
         # Simple project name with no subproject
         elif project := client.find_project_by_title(title=tag):
             tag_projects_phids.append(project["phid"])
         else:
             ctx.fail(f"Project {tag} not found")
+
     if tag_projects_phids:
         task_params["projects.add"] = tag_projects_phids
     else:
@@ -141,7 +145,7 @@ def create_task(
             ctx.fail(f"User {owner} not found")
 
     if parent_id:
-        parent = client.show_task(parent_id)
+        parent = client.show_task(int(parent_id))
         task_params["parents.set"] = [parent["phid"]]
 
     cc_phids = []

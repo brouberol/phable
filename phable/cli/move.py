@@ -5,7 +5,7 @@ import click
 from phable.cli.utils import VARIADIC, find_project_phid_by_title, project_phid_option
 from phable.config import config
 from phable.phabricator import PhabricatorClient
-from phable.task import TASK_ID, TaskStatus
+from phable.task import TASK_ID
 
 
 @click.command(name="move")
@@ -32,7 +32,7 @@ def move_task(
     ctx: click.Context,
     project: Optional[str],
     task_ids: list[int],
-    column: Optional[str],
+    column: str,
     milestone: bool,
 ) -> None:
     """Move one or several task on their current project board
@@ -62,4 +62,4 @@ def move_task(
             if column.lower() == "done":
                 client.mark_task_as_resolved(task_id)
     except ValueError as ve:
-        ctx.fail(ve)
+        ctx.fail(str(ve))
