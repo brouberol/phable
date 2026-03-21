@@ -56,7 +56,7 @@ def list_tasks(
     owner: Optional[str] = None,
     milestone: bool = False,
     status: list[str] | None = None,
-    format: TaskFormat = TaskFormat.PLAIN,
+    format: TaskFormat = TaskFormat.plain,
 ):
     """Lists and filter tasks
 

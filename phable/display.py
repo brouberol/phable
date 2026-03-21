@@ -1,18 +1,18 @@
 import json
 from collections.abc import Callable
-from enum import StrEnum, auto
+from enum import StrEnum
 
 from .task import Task
 
 
 class TaskFormat(StrEnum):
-    PLAIN = auto()
-    JSON = auto()
-    HTML = auto()
-    MARKDOWN = auto()
-    WIKITEXT = auto()
-    ONELINE = auto()
-    IDS = auto()
+    plain = "plain"
+    json = "json"
+    html = "html"
+    markdown = "markdown"
+    wikitext = "wikitext"
+    oneline = "oneline"
+    ids = "ids"
 
 
 def display_tasks(
@@ -128,19 +128,19 @@ class IdsTaskPrinter(TaskPrinter):
 
 
 def get_printer(format: TaskFormat) -> TaskPrinter:
-    if format == TaskFormat.PLAIN:
+    if format == TaskFormat.plain:
         return PlainTaskPrinter(print)
-    elif format == TaskFormat.JSON:
+    elif format == TaskFormat.json:
         return JsonTaskPrinter(print)
-    elif format == TaskFormat.HTML:
+    elif format == TaskFormat.html:
         return HtmlTaskPrinter(print)
-    elif format == TaskFormat.MARKDOWN:
+    elif format == TaskFormat.markdown:
         return MarkdownTaskPrinter(print)
-    elif format == TaskFormat.WIKITEXT:
+    elif format == TaskFormat.wikitext:
         return WikitextTaskPrinter(print)
-    elif format == TaskFormat.ONELINE:
+    elif format == TaskFormat.oneline:
         return OneLineTaskPrinter(print)
-    elif format == TaskFormat.IDS:
+    elif format == TaskFormat.ids:
         return IdsTaskPrinter(print)
     else:
         raise ValueError(f"Unknown format: {format}")

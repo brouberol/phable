@@ -15,7 +15,7 @@ from phable.task import TASK_ID, Task
 @click.argument("task-id", type=TASK_ID, required=True)
 @click.pass_obj
 def show_task(
-    client: PhabricatorClient, task_id: int, format: TaskFormat = TaskFormat.PLAIN
+    client: PhabricatorClient, task_id: int, format: TaskFormat = TaskFormat.plain
 ):
     """Show task details
 
