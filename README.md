@@ -121,3 +121,13 @@ Add this to `~/.config/fish/completions/phable.fish`:
 ```
 _PHABLE_COMPLETE=fish_source phable | source
 ```
+
+## Contributing
+Install all development depoendencies using
+```bash
+make init
+```
+You can then run every linters and tests that would be run in CI by running:
+```bash
+make ci
+```

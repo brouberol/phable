@@ -16,3 +16,6 @@ ci: lint test
 
 format:
 	poetry run ruff format phable
+
+init:
+	poetry install
