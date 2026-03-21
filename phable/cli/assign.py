@@ -12,6 +12,7 @@ from phable.task import TASK_ID
     "--username",
     required=False,
     help="The username to assign the task to. Self-assign the task if not provided.",
+    default="self",
 )
 @click.option(
     "--secondary",
@@ -47,13 +48,12 @@ def assign_task(
     $ phable assign T123456 T234567 --usernamme self
 
     """
-    if not username or (username == "self"):
+    if username == "self":
         user = client.current_user()
+    elif user := client.find_user_by_username(username):
+        for task_id in task_ids:
+            client.assign_task_to_user(
+                task_id=task_id, user_phid=user["phid"], secondary=secondary
+            )
     else:
-        user = client.find_user_by_username(username)
-        if not user:
-            ctx.fail(f"User {username} was not found")
-    for task_id in task_ids:
-        client.assign_task_to_user(
-            task_id=task_id, user_phid=user["phid"], secondary=secondary
-        )
+        ctx.fail(f"User {username} was not found")

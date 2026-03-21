@@ -20,8 +20,8 @@ def subscribe_to_task(
     $ phable subscribe T123456 T234567
 
     """
-    user = client.current_user()
-    if not user:
+    if user := client.current_user():
+        for task_id in task_ids:
+            client.add_user_to_task_subscribers(task_id=task_id, user_phid=user["phid"])
+    else:
         ctx.fail("Current user was not found")
-    for task_id in task_ids:
-        client.add_user_to_task_subscribers(task_id=task_id, user_phid=user["phid"])
