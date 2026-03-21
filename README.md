@@ -70,6 +70,13 @@ Note: you can also expose these configuration through the following environment 
 
 ## Tips and tricks
 
+### Refer to your own phabricator username
+You can address your own phabricator username as `self`. For example, you can assign a task to yourself by running
+```bash
+phable assign --username self T123456
+```
+This can be useful when sharing command aliases to another user without having them change the username to their own.
+
 ### Setting up aliases
 You can define command aliases. For example, instead of typing `phable move --column 'Done' --milestone T123456`, you might want to type `phable done T123456`. To do this, open the phable configuration file, with `$EDITOR $(phable config show)` and define an alias:
 
