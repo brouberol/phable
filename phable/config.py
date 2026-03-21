@@ -23,10 +23,10 @@ def get_from_config_or_env(config_value: str, env_var_name: str) -> str:
         return val
     if val := os.getenv(env_var_name):
         return val
-    return ""
     _warnings.append(
         f"Required config {config_value} / environment variable {env_var_name} not set"
     )
+    return ""
 
 
 def field_with_default_from_config_then_env(
