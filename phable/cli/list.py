@@ -34,8 +34,8 @@ from phable.task import TaskStatus
 @click.option(
     "--status",
     required=False,
-    type=click.Choice(TaskStatus._member_names_),
-    help="Task(s) status",
+    type=click.Choice(TaskStatus._member_names_, case_sensitive=False),
+    help="Task(s) status to filter on. Can be passed multiple times.",
     default=[TaskStatus.open, TaskStatus.progress, TaskStatus.stalled],
     multiple=True,
 )
