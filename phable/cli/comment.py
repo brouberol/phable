@@ -1,5 +1,5 @@
 from typing import Optional
-
+from pathlib import Path
 import click
 
 from phable.phabricator import PhabricatorClient
@@ -25,5 +25,11 @@ def comment_on_task(client: PhabricatorClient, task_id: int, comment: Optional[s
     $ phable comment T123456                                # set comment body from your own text editor
 
     """
-    comment = text_from_cli_arg_or_fs_or_editor(body=comment)
-    client.create_or_edit_task(task_id=task_id, params={"comment": comment})
+    path, body = None, None
+    if comment:
+        if Path(comment).exists():
+            path = Path(comment)
+        else:
+            body = comment
+    if comment := text_from_cli_arg_or_fs_or_editor(path=path, body=body):
+        client.create_or_edit_task(task_id=task_id, params={"comment": comment})

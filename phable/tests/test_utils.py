@@ -1,14 +1,15 @@
 from pathlib import Path
 from unittest import mock
 
-import pytest
 
 from phable.utils import text_from_cli_arg_or_fs_or_editor
 
 
-def test_text_from_cli_arg_or_fs_or_editor_with_noting():
-    with pytest.raises(ValueError):
+def test_text_from_cli_arg_or_fs_or_editor_with_noting(monkeypatch):
+    monkeypatch.setenv("EDITOR", "vim")
+    with mock.patch("phable.utils.subprocess.run") as m_sub_run:
         text_from_cli_arg_or_fs_or_editor()
+        m_sub_run.assert_called_once_with(["vim", mock.ANY])
 
 
 def test_text_from_cli_arg_or_fs_or_editor_with_text_body():

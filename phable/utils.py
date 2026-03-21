@@ -1,5 +1,6 @@
 import os
 import subprocess
+import tempfile
 from pathlib import Path
 from typing import cast
 
@@ -16,7 +17,11 @@ def text_from_cli_arg_or_fs_or_editor(
 
     """
     if not (body or path):
-        raise ValueError("Either a body or path must be specified")
+        txt_tmpfile = tempfile.NamedTemporaryFile(
+            encoding="utf-8", mode="w", suffix=".md"
+        )
+        subprocess.run([os.environ["EDITOR"], txt_tmpfile.name])
+        return Path(txt_tmpfile.name).read_text(encoding="utf-8")
 
     if body:
         return body
