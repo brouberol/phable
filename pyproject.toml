@@ -23,9 +23,9 @@ mypy = "^1.19.1"
 types-requests = "^2.32.4.20260107"
 
 [tool.pytest.ini_options]
-addopts = "-m 'not integration'"
+addopts = "-m 'not exploratory'"
 markers = [
-    "integration: marks tests as integration tests requiring a live Phabricator instance (run with: pytest -m integration)",
+    "exploratory: marks tests as exploratory tests requiring a live Phabricator instance, those are used to explore the JSON responses (run with: pytest -m exploratory)",
 ]
 
 [build-system]

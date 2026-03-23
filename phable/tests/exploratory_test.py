@@ -17,7 +17,7 @@ def client():
     return PhabricatorClient(config.phabricator_url, config.phabricator_token)
 
 
-@pytest.mark.integration
+@pytest.mark.exploratory
 def test_find_tasks_in_project_columns(client):
     current_milestone_phid = client.get_project_current_milestone_phid(
         config.phabricator_default_project_phid
@@ -33,7 +33,7 @@ def test_find_tasks_in_project_columns(client):
         assert column_phid.startswith("PHID-PCOL-")
 
 
-@pytest.mark.integration
+@pytest.mark.exploratory
 def test_validate_and_build_column_map(client):
     milestones = client.find_milestones_for_project(
         parent_phid=config.phabricator_default_project_phid
@@ -57,7 +57,7 @@ def test_validate_and_build_column_map(client):
         assert source_phid != target_phid
 
 
-@pytest.mark.integration
+@pytest.mark.exploratory
 def test_find_milestones_for_project(client):
     milestones = client.find_milestones_for_project(
         parent_phid=config.phabricator_default_project_phid
