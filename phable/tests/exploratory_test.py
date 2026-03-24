@@ -41,7 +41,9 @@ def test_validate_and_build_column_map(client):
     assert len(milestones) >= 2, "Need at least 2 milestones to compare"
 
     previous, current = milestones[-2], milestones[-1]
-    print(f"\nComparing columns between '{previous['fields']['name']}' and '{current['fields']['name']}'")
+    print(
+        f"\nComparing columns between '{previous['fields']['name']}' and '{current['fields']['name']}'"
+    )
 
     column_map = client.validate_and_build_column_map(
         source_phid=previous["phid"],
@@ -73,4 +75,7 @@ def test_find_milestones_for_project(client):
     for milestone in milestones:
         assert milestone["type"] == "PROJ"
         assert isinstance(milestone["fields"]["milestone"], int)
-        assert milestone["fields"]["parent"]["phid"] == config.phabricator_default_project_phid
+        assert (
+            milestone["fields"]["parent"]["phid"]
+            == config.phabricator_default_project_phid
+        )

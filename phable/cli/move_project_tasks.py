@@ -83,10 +83,12 @@ def move_project_tasks(
     }
 
     # Fetch tasks for preview
-    tasks_with_columns = client.find_tasks_in_project_columns(source_milestone["phid"], ignored_columns)
+    tasks_with_columns = client.find_tasks_in_project_columns(
+        source_milestone["phid"], ignored_columns
+    )
 
     if not tasks_with_columns:
-        click.echo(f"No tasks to move from '{source_milestone["fields"]["name"]}'.")
+        click.echo(f"No tasks to move from '{source_milestone['fields']['name']}'.")
         return
 
     # Group by column for summary display
@@ -95,17 +97,27 @@ def move_project_tasks(
         by_column[col_phid].append(task)
 
     click.echo(
-        f"\nMoving tasks from '{source_milestone["fields"]["name"]}' → '{target_milestone["fields"]["name"]}':")
+        f"\nMoving tasks from '{source_milestone['fields']['name']}' → '{target_milestone['fields']['name']}':"
+    )
     for col_phid, col_tasks in by_column.items():
         click.echo(f"  {source_col_name[col_phid]}: {len(col_tasks)} task(s)")
     click.echo(f"\n  Total: {len(tasks_with_columns)} task(s)")
 
-    moved = client.move_tasks_to_milestone(source_milestone["phid"], target_milestone["phid"], ignored_columns)
-    click.echo(f"\nMoved {len(moved)} task(s) to '{target_milestone["fields"]["name"]}'.")
+    moved = client.move_tasks_to_milestone(
+        source_milestone["phid"], target_milestone["phid"], ignored_columns
+    )
+    click.echo(
+        f"\nMoved {len(moved)} task(s) to '{target_milestone['fields']['name']}'."
+    )
 
 
-def find_milestone(ctx: Context, milestones: list[dict[str, Any]], milestones_by_name: dict[str, dict[str, Any]],
-                   target: Optional[str], default_index: int) -> dict[str, Any]:
+def find_milestone(
+    ctx: Context,
+    milestones: list[dict[str, Any]],
+    milestones_by_name: dict[str, dict[str, Any]],
+    target: Optional[str],
+    default_index: int,
+) -> dict[str, Any]:
     if target:
         if target not in milestones_by_name:
             ctx.fail(f"Milestone '{target}' not found.")
