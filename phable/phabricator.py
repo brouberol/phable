@@ -370,7 +370,8 @@ class PhabricatorClient:
         ignored_lower = {c.lower() for c in ignored_columns}
 
         source_columns = [
-            col for col in self.list_project_columns(source_phid)
+            col
+            for col in self.list_project_columns(source_phid)
             if col["fields"]["name"].lower() not in ignored_lower
         ]
         target_by_name = {
@@ -407,8 +408,12 @@ class PhabricatorClient:
         Note that Phorge already enforces that a task can only be in a single milestone for a
         given project, so no need to remove the current milestone.
         """
-        column_map = self.validate_and_build_column_map(source_phid, target_phid, ignored_columns)
-        tasks_with_columns = self.find_tasks_in_project_columns(source_phid, ignored_columns)
+        column_map = self.validate_and_build_column_map(
+            source_phid, target_phid, ignored_columns
+        )
+        tasks_with_columns = self.find_tasks_in_project_columns(
+            source_phid, ignored_columns
+        )
 
         moved = []
         for task, source_column_phid in tasks_with_columns:
@@ -431,8 +436,7 @@ class PhabricatorClient:
 
         columns = self.list_project_columns(project_phid)
         active_columns = [
-            col for col in columns
-            if col["fields"]["name"].lower() not in ignored_lower
+            col for col in columns if col["fields"]["name"].lower() not in ignored_lower
         ]
 
         result = []
