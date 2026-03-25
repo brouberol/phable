@@ -19,5 +19,5 @@ def show_cache():
 @_cache.command()
 def clear():
     """Delete the phable internal cache file"""
-    cache.cache_filepath.unlink(missing_ok=True)
+    cache.clear()
     atexit.unregister(cache.dump)  # avoid re-dumping the in-memory cache back to disk

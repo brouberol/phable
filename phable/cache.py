@@ -42,6 +42,16 @@ class Cache:
     def dump(self):
         json.dump(self.data, open(self.cache_filepath, "w"), indent=2)
 
+    def clear(self):
+        self.clear_disk()
+        self.clear_memory()
+
+    def clear_disk(self):
+        self.cache_filepath.unlink(missing_ok=True)
+
+    def clear_memory(self):
+        self.data = {}
+
     def __setitem__(self, key, value):
         self.data[key] = value
 
