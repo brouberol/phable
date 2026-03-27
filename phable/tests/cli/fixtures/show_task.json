@@ -1,0 +1,102 @@
+{
+  "result": {
+    "data": [
+      {
+        "id": 417698,
+        "type": "TASK",
+        "phid": "PHID-TASK-cvmnxh4xzucrypwyuc66",
+        "fields": {
+          "name": "Ensure select dse-k8s-hosted microservices can run active/active",
+          "description": {
+            "raw": "While we [[ https://phabricator.wikimedia.org/T408643 | added a second dse-k8s cluster in CODFW ]],  we never completed the necessary steps for our hosted services to run active/active. \n\nThere's not much use to having a second cluster if we can't do active/active for services, so I'm creating this ticket to:\n[x] Complete all steps necessary for select dse-k8s services to run active/active*\n[x] Verify operation\n\n*Not all services can or should run active/active. For the purposes of this ticket, we're scoping to `opensearch-ipoid` and `opensearch-test`.\n"
+          },
+          "authorPHID": "PHID-USER-jwsqammdbw33izmv4f4r",
+          "ownerPHID": "PHID-USER-jwsqammdbw33izmv4f4r",
+          "status": {
+            "value": "resolved",
+            "name": "Resolved",
+            "color": "green"
+          },
+          "priority": {
+            "value": 50,
+            "name": "Medium",
+            "color": "orange"
+          },
+          "points": null,
+          "subtype": "default",
+          "closerPHID": "PHID-USER-jwsqammdbw33izmv4f4r",
+          "dateClosed": 1774280369,
+          "groupByProjectPHID": null,
+          "spacePHID": "PHID-SPCE-6l6g5p53yi3mypnlpxjw",
+          "dateCreated": 1771359206,
+          "dateModified": 1774600974,
+          "policy": {
+            "view": "public",
+            "interact": "public",
+            "edit": "PHID-PLCY-3wn235efdwbui7ld6h6y"
+          },
+          "custom.deadline.due": null,
+          "custom.train.status": null,
+          "custom.train.backup": null,
+          "custom.external_reference": null,
+          "custom.release.version": null,
+          "custom.release.date": null,
+          "custom.security_topic": null,
+          "custom.risk.summary": null,
+          "custom.risk.impacted": null,
+          "custom.risk.rating": null,
+          "custom.requestor.affiliation": null,
+          "custom.error.reqid": null,
+          "custom.error.stack": null,
+          "custom.error.url": null,
+          "custom.error.id": null,
+          "custom.points.final": null,
+          "custom.deadline.start": null
+        },
+        "attachments": {
+          "subscribers": {
+            "subscriberPHIDs": [
+              "PHID-USER-lqhywe57ljzomf36owq7",
+              "PHID-USER-wniuzmzvlcmyao2o72qy",
+              "PHID-USER-5msoy5uf25kojtultrnv",
+              "PHID-USER-hgn5uw2jafgjgfvxibhh",
+              "PHID-USER-jwsqammdbw33izmv4f4r"
+            ],
+            "subscriberCount": 5,
+            "viewerIsSubscribed": false
+          },
+          "projects": {
+            "projectPHIDs": [
+              "PHID-PROJ-nk6fdveuzkehlysztapo"
+            ]
+          },
+          "columns": {
+            "boards": {
+              "PHID-PROJ-nk6fdveuzkehlysztapo": {
+                "columns": [
+                  {
+                    "id": 37028,
+                    "phid": "PHID-PCOL-j2emhdbdy2o6se5iaf2a",
+                    "name": "Reported"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    ],
+    "maps": {},
+    "query": {
+      "queryKey": null
+    },
+    "cursor": {
+      "limit": 100,
+      "after": null,
+      "before": null,
+      "order": null
+    }
+  },
+  "error_code": null,
+  "error_info": null
+}

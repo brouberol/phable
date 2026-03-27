@@ -1,20 +1,106 @@
 """Integration tests requiring a live Phabricator instance.
 
 Run with:
-    poetry run pytest -m integration
+    poetry run pytest -m exploratory
 """
 
+import json
 import pprint
+from pathlib import Path
 
 import pytest
 
+from phable.cache import cache
 from phable.config import config
 from phable.phabricator import PhabricatorClient
+
+CLI_FIXTURES_DIR = Path(__file__).parent / "cli" / "fixtures"
 
 
 @pytest.fixture
 def client():
     return PhabricatorClient(config.phabricator_url, config.phabricator_token)
+
+
+def capture_response(client: PhabricatorClient) -> list:
+    """Attach a session hook that records the next HTTP response body.
+
+    Returns a one-element list that will be populated after the next API call.
+    The cache is cleared first so that @cached methods always hit the network.
+    """
+    cache.clear_memory()
+    captured = []
+    client.session.hooks["response"].append(
+        lambda r, *args, **kwargs: captured.append(r.json())
+    )
+    return captured
+
+
+def save_fixture(name: str, data: dict) -> None:
+    (CLI_FIXTURES_DIR / name).write_text(json.dumps(data, indent=2))
+
+
+@pytest.mark.exploratory
+def test_capture_show_task_fixture(client):
+    """Capture the raw HTTP response for T417698 used by the 'show' command integration tests.
+
+    Run with:
+        poetry run pytest -m exploratory -s phable/tests/exploratory_test.py::test_capture_show_task_fixture
+    """
+    captured = capture_response(client)
+    client.show_task(417698)
+    assert captured, "No HTTP response was captured"
+    save_fixture("show_task.json", captured[0])
+
+
+@pytest.mark.exploratory
+def test_capture_show_user_fixture(client):
+    """Capture show_user HTTP response for the author of T417698.
+
+    Reads show_task.json to derive the authorPHID. Run after test_capture_show_task_fixture.
+    """
+    captured = capture_response(client)
+    client.show_user(phid="PHID-USER-jwsqammdbw33izmv4f4r")
+    assert captured, "No HTTP response was captured"
+    save_fixture("show_user.json", captured[0])
+
+
+@pytest.mark.exploratory
+def test_capture_show_projects_fixture(client):
+    """Capture show_projects HTTP response for the project tags of T417698.
+
+    Reads show_task.json to derive the projectPHIDs. Run after test_capture_show_task_fixture.
+    """
+    project_phids = ["PHID-PROJ-nk6fdveuzkehlysztapo"]
+
+    captured = capture_response(client)
+    client.show_projects(phids=project_phids)
+    assert captured, "No HTTP response was captured"
+    save_fixture("show_projects.json", captured[0])
+
+
+@pytest.mark.exploratory
+def test_capture_find_subtasks_fixture(client):
+    """Capture find_subtasks HTTP response for T417698.
+
+    Run after test_capture_show_task_fixture.
+    """
+    captured = capture_response(client)
+    client.find_subtasks(parent_id=417698)
+    assert captured, "No HTTP response was captured"
+    save_fixture("find_subtasks.json", captured[0])
+
+
+@pytest.mark.exploratory
+def test_capture_find_parent_task_fixture(client):
+    """Capture find_parent_task HTTP response for T417698.
+
+    Run after test_capture_show_task_fixture.
+    """
+    captured = capture_response(client)
+    client.find_parent_task(subtask_id=417698)
+    assert captured, "No HTTP response was captured"
+    save_fixture("find_parent_task.json", captured[0])
 
 
 @pytest.mark.exploratory
