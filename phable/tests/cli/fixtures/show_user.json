@@ -1,0 +1,41 @@
+{
+  "result": {
+    "data": [
+      {
+        "id": 31519,
+        "type": "USER",
+        "phid": "PHID-USER-jwsqammdbw33izmv4f4r",
+        "fields": {
+          "username": "bking",
+          "realName": "Brian King",
+          "mediawikiUsername": "BKing (WMF)",
+          "roles": [
+            "verified",
+            "approved",
+            "activated"
+          ],
+          "dateCreated": 1639603198,
+          "dateModified": 1668716274,
+          "policy": {
+            "view": "public",
+            "edit": "no-one"
+          },
+          "custom.irc_nick": null
+        },
+        "attachments": {}
+      }
+    ],
+    "maps": {},
+    "query": {
+      "queryKey": null
+    },
+    "cursor": {
+      "limit": 100,
+      "after": null,
+      "before": null,
+      "order": null
+    }
+  },
+  "error_code": null,
+  "error_info": null
+}
