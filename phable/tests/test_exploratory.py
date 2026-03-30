@@ -104,6 +104,47 @@ def test_capture_find_parent_task_fixture(client):
 
 
 @pytest.mark.exploratory
+def test_capture_current_user_fixture(client):
+    """Capture the user.whoami HTTP response, used by tests that exercise --owner self.
+
+    Run with:
+        poetry run pytest -m exploratory -s phable/tests/exploratory_test.py::test_capture_current_user_fixture
+    """
+    captured = capture_response(client)
+    client.current_user()
+    assert captured, "No HTTP response was captured"
+    save_fixture("current_user.json", captured[0])
+
+
+@pytest.mark.exploratory
+def test_capture_find_tasks_for_current_user(client):
+    captured = capture_response(client)
+    client.find_tasks(
+        column_phids=[],
+        owner_phid="PHID-USER-oknilgmxl4rosyulvny7",
+        backup_owner_phid=None,
+        project_phid="PHID-PROJ-r456pnp5exj6uphuhwy6",
+        status=["open", "progress", "stalled"],
+    )
+    assert captured, "No HTTP response was captured"
+    save_fixture("tasks_for_current_user.json", captured[0])
+
+
+@pytest.mark.exploratory
+def test_capture_find_tasks_where_user_is_backup_owner(client):
+    captured = capture_response(client)
+    client.find_tasks(
+        column_phids=[],
+        owner_phid=None,
+        backup_owner_phid="PHID-USER-oknilgmxl4rosyulvny7",
+        project_phid="PHID-PROJ-r456pnp5exj6uphuhwy6",
+        status=["open", "progress", "stalled"],
+    )
+    assert captured, "No HTTP response was captured"
+    save_fixture("tasks_where_user_is_backup_owner.json", captured[0])
+
+
+@pytest.mark.exploratory
 def test_find_tasks_in_project_columns(client):
     current_milestone_phid = client.get_project_current_milestone_phid(
         config.phabricator_default_project_phid

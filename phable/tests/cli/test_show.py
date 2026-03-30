@@ -3,7 +3,7 @@ from click.testing import CliRunner
 
 from phable.cli.show import show_task
 from phable.phabricator import PhabricatorClient
-from phable.tests.cli.conftest import load_fixture, BASE_URL
+from phable.tests.cli.conftest import add_response
 
 
 def _add_show_mocks():
@@ -12,12 +12,6 @@ def _add_show_mocks():
     add_response(endpoint="project.search", fixture="show_projects.json")
     add_response(endpoint="maniphest.search", fixture="find_subtasks.json")
     add_response(endpoint="maniphest.search", fixture="find_parent_task.json")
-
-
-def add_response(endpoint: str, fixture: str):
-    responses.add(
-        responses.POST, BASE_URL + "api/" + endpoint, json=load_fixture(fixture)
-    )
 
 
 @responses.activate
