@@ -12,17 +12,22 @@ from phable.task import TASK_ID, Task
     default="plain",
     help="Output format",
 )
+@click.option("--all", "show_all", is_flag=True, help="Also show task comments")
 @click.argument("task-id", type=TASK_ID, required=True)
 @click.pass_obj
 def show_task(
-    client: PhabricatorClient, task_id: int, format: TaskFormat = TaskFormat.plain
+    client: PhabricatorClient,
+    task_id: int,
+    format: TaskFormat = TaskFormat.plain,
+    show_all: bool = False,
 ):
     """Show task details
 
     \b
     Examples:
     $ phable show T123456                 # show task details as plaintext
-    $ phable show T123456  --format=json  # show task details as json
+    $ phable show T123456 --all           # show task details with comments
+    $ phable show T123456 --format=json   # show task details as json
 
     """
     if task := client.show_task(task_id):
@@ -32,6 +37,7 @@ def show_task(
             with_tags=True,
             with_subtasks=True,
             with_parent=True,
+            with_comments=show_all,
         )
         display_task(task=task, format=format)
     else:

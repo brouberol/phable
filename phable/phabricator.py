@@ -108,6 +108,7 @@ class PhabricatorClient:
         with_tags: bool = False,
         with_subtasks: bool = False,
         with_parent: bool = False,
+        with_comments: bool = False,
     ) -> dict[str, Any]:
         """Load additional data about a task.
 
@@ -128,6 +129,8 @@ class PhabricatorClient:
             self.enrich_task_with_subtasks(task)
         if with_parent:
             self.enrich_task_with_parent(task)
+        if with_comments:
+            self.enrich_task_with_comments(task)
         return task
 
     def enrich_task_with_author_owner(self, task: dict[str, Any]) -> None:
@@ -167,6 +170,21 @@ class PhabricatorClient:
     def enrich_task_with_parent(self, task: dict[str, Any]) -> None:
         parent = self.find_parent_task(subtask_id=task["id"])
         task["parent"] = parent
+
+    def enrich_task_with_comments(self, task: dict[str, Any]) -> None:
+        transactions = self.find_task_transactions(task_id=task["id"])
+        task["comments"] = [
+            comment["content"]["raw"]
+            for transaction in transactions
+            for comment in transaction.get("comments", [])
+            if not comment.get("removed") and comment.get("content", {}).get("raw")
+        ]
+
+    def find_task_transactions(self, task_id: int) -> list[dict[str, Any]]:
+        return self._make_request(
+            "transaction.search",
+            params={"objectIdentifier": Task.from_int(task_id)},
+        )["result"]["data"]
 
     def find_tasks(
         self,
