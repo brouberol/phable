@@ -104,6 +104,14 @@ class PlainTaskPrinter(TaskPrinter):
                 print(
                     f"{status} - {Task.from_int(subtask['id'])} - @{subtask['owner']:<10} - {subtask['fields']['name']}"
                 )
+        if "comments" in task:
+            print("Comments:")
+            if task["comments"]:
+                for i, comment in enumerate(task["comments"], start=1):
+                    print(f"--- Comment #{i} ---")
+                    print(comment)
+            else:
+                print("(none)")
 
     def print_list(self, tasks: list[dict]) -> None:
         for task in tasks:
