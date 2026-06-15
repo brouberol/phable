@@ -1,4 +1,6 @@
+import hashlib
 import re
+import tempfile
 from pathlib import Path
 from typing import Optional
 
@@ -85,8 +87,16 @@ def create_task(
     $ phable create --title 'A task' --cc brouberol
 
     """
-    force_editor = False
+    force_editor, should_delete_description_file = False, False
     body, path = None, None
+
+    # Check if a file containing the task description might have been left over by
+    # a previous failed attempt. If it does, use it, so we can avoid typing the description
+    # all over again.
+    title_sha1 = hashlib.sha1()
+    title_sha1.update(title.encode("utf-8"))
+    path = Path(tempfile.gettempdir()) / f"{title_sha1.hexdigest()}.md"
+
     if template:
         if template.exists():
             body = template.read_text()
@@ -95,6 +105,10 @@ def create_task(
             ctx.fail(f"Template file {template} does not exist")
     elif description is not None and Path(description).exists():
         path = Path(description)
+    else:
+        path.touch()
+        force_editor = True
+
     description = text_from_cli_arg_or_fs_or_editor(
         body=body, path=path, force_editor=force_editor
     )
@@ -159,3 +173,5 @@ def create_task(
 
     task = client.create_or_edit_task(task_params)
     ctx.invoke(show_task, task_id=task["result"]["object"]["id"])
+    if should_delete_description_file:
+        path.unlink(missing_ok=True)
