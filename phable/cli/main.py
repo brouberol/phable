@@ -17,9 +17,7 @@ from phable.cli.parent import parent
 from phable.cli.report import report_done_tasks
 from phable.cli.set import set_task_fields
 from phable.cli.show import show_task
-from phable.cli.status import set_task_status
 from phable.cli.subscribe import subscribe_to_task
-from phable.cli.tag import tag_task
 from phable.config import config
 from phable.phabricator import PhabricatorClient
 
@@ -104,9 +102,7 @@ cli.add_command(report_done_tasks)
 cli.add_command(show_task)
 cli.add_command(subscribe_to_task)
 cli.add_command(list_tasks)
-cli.add_command(tag_task)
 cli.add_command(parent)
-cli.add_command(set_task_status)
 cli.add_command(set_task_fields)
 
 
