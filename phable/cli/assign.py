@@ -48,10 +48,9 @@ def assign_task(
     """
     if username == "self":
         user = client.current_user()
-    elif user := client.find_user_by_username(username):
-        for task_id in task_ids:
-            client.assign_task_to_user(
-                task_id=task_id, user_phid=user["phid"], secondary=secondary
-            )
-    else:
+    elif not (user := client.find_user_by_username(username)):
         ctx.fail(f"User {username} was not found")
+    for task_id in task_ids:
+        client.assign_task_to_user(
+            task_id=task_id, user_phid=user["phid"], secondary=secondary
+        )
