@@ -16,7 +16,12 @@ from phable.task import TASK_ID, TaskPriority, TaskStatus
 @click.option(
     "--status", type=click.Choice(TaskStatus._member_names_), help="Task(s) status"
 )
-@click.option("--tags", type=str, multiple=True, help="Task(s) tag(s)")
+@click.option(
+    "--tags",
+    type=str,
+    multiple=True,
+    help="Task tag(s) to add without removing existing tags",
+)
 @click.argument("task-ids", type=TASK_ID, nargs=VARIADIC)
 @click.pass_context
 @click.pass_obj
@@ -41,7 +46,7 @@ def set_task_fields(
     # Set the status for a single task
     $ phable set T123456 --status resolved
     \b
-    # Set the tags for a single task
+    # Add tags to a single task
     $ phable set T123456 --tags 'Epic' 'OKR'
 
     """
@@ -52,10 +57,12 @@ def set_task_fields(
         else:
             ctx.fail(f"Tag '{tag}' not found")
 
-    params: dict[str, str] = {}
+    params: dict[str, str | list] = {}
     if priority:
         params["priority"] = priority
     if status:
         params["status"] = status
+    if tag_phids:
+        params["projects.add"] = tag_phids
     for task_id in task_ids:
         client.create_or_edit_task(task_id=task_id, params=params)
