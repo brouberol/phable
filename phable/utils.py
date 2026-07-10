@@ -54,16 +54,13 @@ def find_editor() -> str:
     If none of these work, emit a useful error message and exit with a
     non-zero status.
     """
-    editor = os.environ.get("EDITOR")
-    if editor:
+    if editor := os.environ.get("EDITOR"):
         return editor
 
-    editor = shutil.which("sensible-editor")
-    if editor:
+    if editor := shutil.which("sensible-editor"):
         return editor
 
-    editor = shutil.which("nano")
-    if editor:
+    if editor := shutil.which("nano"):
         return editor
 
     # None of the choices worked out, emit a message and exit
