@@ -86,6 +86,24 @@ phable assign --username self T123456
 ```
 This can be useful when sharing command aliases to another user without having them change the username to their own.
 
+### Defining your prefered text editor
+Some `phable` commands, such as `create` or `edit` will open a text editor for you to edit the task description.
+
+`phable` will attempt to respect your choice in term of what editor you would like to use, and perform a sensible guess if no editor is specified.
+
+It will use
+
+1. the content of your `EDITOR` environment variable
+2. what was defined in configuration, under `core.editor`. For example
+  ```ini
+  [core]
+  editor = nvim
+  ```
+3. the output of the `sensible-editor` command (if it can be found)
+4. `nano` (if it is in your PATH)
+
+If none of these options work, an error message will be raised and the command will fail.
+
 ### Setting up aliases
 You can define command aliases. For example, instead of typing `phable move --column 'Done' --milestone T123456`, you might want to type `phable done T123456`. To do this, open the phable configuration file, with `$EDITOR $(phable config show)` and define an alias:
 

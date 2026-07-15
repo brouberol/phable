@@ -6,6 +6,8 @@ import tempfile
 from pathlib import Path
 from typing import cast
 
+from .config import config
+
 
 def text_from_cli_arg_or_fs_or_editor(
     body: str | None = None, path: Path | None = None, force_editor: bool = False
@@ -52,8 +54,12 @@ def find_editor() -> str:
 
     If none of these work, emit a useful error message and exit with a
     non-zero status.
+
     """
     if editor := os.environ.get("EDITOR"):
+        return editor
+
+    if editor := config.data.get("core", {}).get("editor"):
         return editor
 
     if editor := shutil.which("sensible-editor"):
