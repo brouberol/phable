@@ -25,9 +25,11 @@ def edit_task(client: PhabricatorClient, ctx: click.Context, task_id: int):
             mode="w", encoding="utf-8", suffix=".md", delete=False
         ).name
     )
-    initial_description_filepath.write_text(task["fields"]["description"]["raw"])
+    initial_description = task["fields"]["description"]["raw"]
+    initial_description_filepath.write_text(initial_description)
     updated_description = text_from_cli_arg_or_fs_or_editor(
         path=initial_description_filepath, force_editor=True
     )
-    client.edit_description(task_id=task_id, description=updated_description)
+    if updated_description != initial_description:
+        client.edit_description(task_id=task_id, description=updated_description)
     initial_description_filepath.unlink(missing_ok=True)
