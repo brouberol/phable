@@ -18,11 +18,12 @@ def text_from_cli_arg_or_fs_or_editor(
     user.
 
     """
+    editor = find_editor()
     if not (body or path):
         txt_tmpfile = tempfile.NamedTemporaryFile(
             encoding="utf-8", mode="w", suffix=".md"
         )
-        subprocess.run([os.environ["EDITOR"], txt_tmpfile.name])
+        subprocess.run([editor, txt_tmpfile.name])
         return Path(txt_tmpfile.name).read_text(encoding="utf-8")
 
     if body:
@@ -34,8 +35,6 @@ def text_from_cli_arg_or_fs_or_editor(
 
     if not force_editor:
         return path.read_text(encoding="utf-8")
-
-    editor = find_editor()
 
     subprocess.run([editor, path])
     return path.read_text(encoding="utf-8")
