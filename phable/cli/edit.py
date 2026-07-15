@@ -30,3 +30,4 @@ def edit_task(client: PhabricatorClient, ctx: click.Context, task_id: int):
         path=initial_description_filepath, force_editor=True
     )
     client.edit_description(task_id=task_id, description=updated_description)
+    initial_description_filepath.unlink(missing_ok=True)
