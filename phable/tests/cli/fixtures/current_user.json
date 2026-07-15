@@ -1,0 +1,17 @@
+{
+  "result": {
+    "phid": "PHID-USER-oknilgmxl4rosyulvny7",
+    "userName": "Gehel",
+    "realName": "Guillaume Lederrey",
+    "image": "https://phab.wmfusercontent.org/file/data/wxni4dd2w73zpqvtmjdq/PHID-FILE-ywrfhopc4oo74akgzhxh/profile",
+    "uri": "https://phabricator.wikimedia.org/p/Gehel/",
+    "roles": [
+      "verified",
+      "approved",
+      "activated"
+    ],
+    "primaryEmail": "glederrey@wikimedia.org"
+  },
+  "error_code": null,
+  "error_info": null
+}

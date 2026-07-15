@@ -1,0 +1,214 @@
+{
+  "result": {
+    "data": [
+      {
+        "id": 418664,
+        "type": "TASK",
+        "phid": "PHID-TASK-3czln7eispcasgrlyxlg",
+        "fields": {
+          "name": "Requesting Kerberos access for  SCardenas (WMF)",
+          "description": {
+            "raw": "* My username on wikitech.wikimedia.org is: SCardenas (WMF)\n* See https://wikitech.wikimedia.org/wiki/Analytics/Data_access\n\nI need access to `Analytics-privatedata-users` for my work as a software engineer in the Moderator Tools team."
+          },
+          "authorPHID": "PHID-USER-a3gzgfhvkpwcpjyibpik",
+          "ownerPHID": "PHID-USER-oknilgmxl4rosyulvny7",
+          "status": {
+            "value": "open",
+            "name": "Open",
+            "color": null
+          },
+          "priority": {
+            "value": 90,
+            "name": "Needs Triage",
+            "color": "violet"
+          },
+          "points": null,
+          "subtype": "default",
+          "closerPHID": null,
+          "dateClosed": null,
+          "groupByProjectPHID": null,
+          "spacePHID": "PHID-SPCE-6l6g5p53yi3mypnlpxjw",
+          "dateCreated": 1772244895,
+          "dateModified": 1774605157,
+          "policy": {
+            "view": "public",
+            "interact": "public",
+            "edit": "users"
+          },
+          "custom.deadline.due": null,
+          "custom.train.status": null,
+          "custom.train.backup": null,
+          "custom.external_reference": null,
+          "custom.release.version": null,
+          "custom.release.date": null,
+          "custom.security_topic": "default",
+          "custom.risk.summary": null,
+          "custom.risk.impacted": null,
+          "custom.risk.rating": null,
+          "custom.requestor.affiliation": null,
+          "custom.error.reqid": null,
+          "custom.error.stack": null,
+          "custom.error.url": null,
+          "custom.error.id": null,
+          "custom.points.final": null,
+          "custom.deadline.start": null
+        },
+        "attachments": {
+          "subscribers": {
+            "subscriberPHIDs": [
+              "PHID-USER-elsr3rwzokgy7mj2tras",
+              "PHID-USER-hgn5uw2jafgjgfvxibhh",
+              "PHID-USER-a3gzgfhvkpwcpjyibpik"
+            ],
+            "subscriberCount": 3,
+            "viewerIsSubscribed": true
+          },
+          "projects": {
+            "projectPHIDs": [
+              "PHID-PROJ-imzvjznpvtcs2rzya67g",
+              "PHID-PROJ-onnxucoedheq3jevknyr",
+              "PHID-PROJ-jlntasvg65b6mmtbpwwe",
+              "PHID-PROJ-gsfmtborh6beh6xj5lz6"
+            ]
+          },
+          "columns": {
+            "boards": {
+              "PHID-PROJ-imzvjznpvtcs2rzya67g": {
+                "columns": [
+                  {
+                    "id": 37254,
+                    "phid": "PHID-PCOL-ob5hy2de7kvwvmkdozhh",
+                    "name": "Blocked/Waiting"
+                  }
+                ]
+              },
+              "PHID-PROJ-gsfmtborh6beh6xj5lz6": {
+                "columns": [
+                  {
+                    "id": 20802,
+                    "phid": "PHID-PCOL-h4o5fuw27lpam6k7iu6p",
+                    "name": "Tag with Radar"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": 417573,
+        "type": "TASK",
+        "phid": "PHID-TASK-s5tgjk2nmq6kbwzkxybu",
+        "fields": {
+          "name": "Remove duplicate endpoints (Feb 16, 2026)",
+          "description": {
+            "raw": "The following endpoints on the Allowlist seem to be duplicates:\n\nhttps://beta.sparql.swisslipids.org/sparql shows up twice, one can be removed.\n\nAnd this one has two versions:\nhttp://dbpedia.org/sparql*\nhttp://dbpedia.org/sparql\n\nIs there a reason to have both versions on the list? From what I understand, * allows calling the endpoint with parameters.\n\n\n\n\n"
+          },
+          "authorPHID": "PHID-USER-fyy3girk4ijjrijyrmzj",
+          "ownerPHID": "PHID-USER-oknilgmxl4rosyulvny7",
+          "status": {
+            "value": "progress",
+            "name": "In Progress",
+            "color": "green"
+          },
+          "priority": {
+            "value": 25,
+            "name": "Low",
+            "color": "yellow"
+          },
+          "points": null,
+          "subtype": "default",
+          "closerPHID": null,
+          "dateClosed": null,
+          "groupByProjectPHID": null,
+          "spacePHID": "PHID-SPCE-6l6g5p53yi3mypnlpxjw",
+          "dateCreated": 1771239361,
+          "dateModified": 1774605133,
+          "policy": {
+            "view": "public",
+            "interact": "public",
+            "edit": "users"
+          },
+          "custom.deadline.due": null,
+          "custom.train.status": null,
+          "custom.train.backup": null,
+          "custom.external_reference": null,
+          "custom.release.version": null,
+          "custom.release.date": null,
+          "custom.security_topic": "default",
+          "custom.risk.summary": null,
+          "custom.risk.impacted": null,
+          "custom.risk.rating": null,
+          "custom.requestor.affiliation": null,
+          "custom.error.reqid": null,
+          "custom.error.stack": null,
+          "custom.error.url": null,
+          "custom.error.id": null,
+          "custom.points.final": null,
+          "custom.deadline.start": null
+        },
+        "attachments": {
+          "subscribers": {
+            "subscriberPHIDs": [
+              "PHID-USER-hgn5uw2jafgjgfvxibhh",
+              "PHID-USER-fyy3girk4ijjrijyrmzj"
+            ],
+            "subscriberCount": 2,
+            "viewerIsSubscribed": true
+          },
+          "projects": {
+            "projectPHIDs": [
+              "PHID-PROJ-imzvjznpvtcs2rzya67g",
+              "PHID-PROJ-onnxucoedheq3jevknyr",
+              "PHID-PROJ-ceqceb2bnio6alj5nxov",
+              "PHID-PROJ-7ocjej2gottz7cikkdc6"
+            ]
+          },
+          "columns": {
+            "boards": {
+              "PHID-PROJ-imzvjznpvtcs2rzya67g": {
+                "columns": [
+                  {
+                    "id": 37253,
+                    "phid": "PHID-PCOL-td2g73z3k4bbnsyepymv",
+                    "name": "Needs Review"
+                  }
+                ]
+              },
+              "PHID-PROJ-ceqceb2bnio6alj5nxov": {
+                "columns": [
+                  {
+                    "id": 3524,
+                    "phid": "PHID-PCOL-z32nynksl2xf566sviwb",
+                    "name": "Watching / Waiting"
+                  }
+                ]
+              },
+              "PHID-PROJ-7ocjej2gottz7cikkdc6": {
+                "columns": [
+                  {
+                    "id": 452,
+                    "phid": "PHID-PCOL-fsqe6373hzn3ml2iqpqq",
+                    "name": "incoming"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    ],
+    "maps": {},
+    "query": {
+      "queryKey": null
+    },
+    "cursor": {
+      "limit": 100,
+      "after": null,
+      "before": null,
+      "order": null
+    }
+  },
+  "error_code": null,
+  "error_info": null
+}
