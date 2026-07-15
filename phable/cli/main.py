@@ -4,11 +4,13 @@ import click
 from click import Context
 
 from phable.cache import cache
+from phable.cli._alias import AliasedCommandGroup
 from phable.cli.assign import assign_task
 from phable.cli.cache import _cache
 from phable.cli.comment import comment_on_task
 from phable.cli.config import _config
 from phable.cli.create import create_task
+from phable.cli.edit import edit_task
 from phable.cli.list import list_tasks
 from phable.cli.move import move_task
 from phable.cli.move_project_tasks import move_project_tasks
@@ -19,7 +21,6 @@ from phable.cli.show import show_task
 from phable.cli.subscribe import subscribe_to_task
 from phable.config import config
 from phable.phabricator import PhabricatorClient
-from phable.cli._alias import AliasedCommandGroup
 
 
 @click.group(cls=AliasedCommandGroup)
@@ -44,6 +45,7 @@ cli.add_command(subscribe_to_task)
 cli.add_command(list_tasks)
 cli.add_command(parent)
 cli.add_command(set_task_fields)
+cli.add_command(edit_task)
 
 
 def runcli():

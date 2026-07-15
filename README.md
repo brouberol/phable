@@ -30,20 +30,20 @@ Options:
   --help     Show this message and exit.
 
 Commands:
-  assign             Assign one or multiple task ids to a username
-  cache              Manage internal cache
-  comment            Add a comment to a task
-  config             Manage phable config
-  create             Create a new task
-  list               Lists and filter tasks
-  move               Move one or several task on their current project board
-  parent             Manage task parents
-  report-done-tasks  Print the details of all tasks in the `from` column and move them to the `to` column.
-  set                Set the fields of one or multiple tasks
-  show               Show task details
-  status             Set the status of one or multiple tasks [DEPRECATED]
-  subscribe          Subscribe to one or multiple task ids
-  tag                Add a tag on one or multiple tasks [DEPRECATED]
+  assign              Assign one or multiple task ids to a username
+  cache               Manage internal cache
+  comment             Add a comment to a task
+  config              Manage phable config
+  create              Create a new task
+  edit                Edit the description text of the argument task
+  list                Lists and filter tasks
+  move                Move one or several task on their current project board
+  move-project-tasks  Move tasks from the previous milestone to the new one while keeping their column.
+  parent              Manage task parents
+  report-done-tasks   Print the details of all tasks in the `from` column and move them to the `to` column.
+  set                 Set the fields of one or multiple tasks
+  show                Show task details
+  subscribe           Subscribe to one or multiple task ids
 ```
 
 A few examples:

@@ -304,6 +304,12 @@ class PhabricatorClient:
             task_id=task_id, params={f"parents.{action}": parent_task_phids}
         )
 
+    def edit_description(self, task_id: int, description: str) -> dict[str, Any]:
+        """Edit the desctiption of the argument task"""
+        return self.create_or_edit_task(
+            task_id=task_id, params={"description": description}
+        )
+
     @cached(ttl=timedelta(days=1))
     def list_project_columns(
         self,
