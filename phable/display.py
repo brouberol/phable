@@ -24,7 +24,7 @@ def display_tasks(
     get_printer(format).print_list(tasks)
 
 
-def display_task(task: dict, format: TaskFormat) -> None:
+def display_task(task: dict, format: str) -> None:
     get_printer(format).print(task)
 
 
@@ -140,7 +140,7 @@ class IdsTaskPrinter(TaskPrinter):
         self._printer(f"{Task.from_int(task['id'])}")
 
 
-def get_printer(format: TaskFormat) -> TaskPrinter:
+def get_printer(format: str) -> TaskPrinter:
     if format == TaskFormat.plain:
         return PlainTaskPrinter(print)
     elif format == TaskFormat.json:

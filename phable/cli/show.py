@@ -19,7 +19,7 @@ from phable.task import TASK_ID, Task
 def show_task(
     client: PhabricatorClient,
     task_id: int,
-    format: TaskFormat = TaskFormat.plain,
+    format: str = TaskFormat.plain,
     show_full: bool = False,
 ):
     """Show task details
