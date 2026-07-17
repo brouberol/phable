@@ -107,9 +107,11 @@ class PlainTaskPrinter(TaskPrinter):
         if "comments" in task:
             print("Comments:")
             if task["comments"]:
-                for i, comment in enumerate(task["comments"], start=1):
-                    print(f"--- Comment #{i} ---")
-                    print(comment)
+                for i, comment in enumerate(reversed(task["comments"]), start=1):
+                    print(
+                        f"--- Comment #{i} by {comment['author']} - {comment['modified'].isoformat()} ---"
+                    )
+                    print(comment["comment"].rstrip(), end="\n\n")
             else:
                 print("(none)")
 

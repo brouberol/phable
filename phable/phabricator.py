@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import UTC, datetime, timedelta
 from importlib.metadata import version
 from typing import Any, Literal, Optional, TypeVar
 
@@ -173,12 +173,23 @@ class PhabricatorClient:
 
     def enrich_task_with_comments(self, task: dict[str, Any]) -> None:
         transactions = self.find_task_transactions(task_id=task["id"])
-        task["comments"] = [
-            comment["content"]["raw"]
-            for transaction in transactions
-            for comment in transaction.get("comments", [])
-            if not comment.get("removed") and comment.get("content", {}).get("raw")
-        ]
+        task["comments"] = []
+        for transaction in transactions:
+            for comment_data in transaction.get("comments", []):
+                if comment_data.get("removed") or not comment_data.get(
+                    "content", {}
+                ).get("raw"):
+                    continue
+                comment = {
+                    "author": None,
+                    "comment": comment_data["content"]["raw"],
+                    "modified": datetime.fromtimestamp(
+                        comment_data["dateModified"], UTC
+                    ),
+                }
+                if author := self.show_user(phid=comment_data["authorPHID"]):
+                    comment["author"] = author["fields"]["username"]
+                task["comments"].append(comment)
 
     def find_task_transactions(self, task_id: int) -> list[dict[str, Any]]:
         return self._make_request(
