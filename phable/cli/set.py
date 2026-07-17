@@ -2,7 +2,7 @@ from typing import Optional
 
 import click
 
-from phable.cli.utils import VARIADIC
+from phable.cli.utils import VARIADIC, choices_from_enum
 from phable.phabricator import PhabricatorClient
 from phable.task import TASK_ID, TaskPriority, TaskStatus
 
@@ -10,12 +10,10 @@ from phable.task import TASK_ID, TaskPriority, TaskStatus
 @click.command(name="set")
 @click.option(
     "--priority",
-    type=click.Choice(TaskPriority._member_names_),
+    type=choices_from_enum(TaskPriority),
     help="Task(s) priority",
 )
-@click.option(
-    "--status", type=click.Choice(TaskStatus._member_names_), help="Task(s) status"
-)
+@click.option("--status", type=choices_from_enum(TaskStatus), help="Task(s) status")
 @click.option(
     "--tags",
     type=str,

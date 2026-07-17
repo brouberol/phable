@@ -1,3 +1,4 @@
+from enum import StrEnum
 from typing import Optional
 
 import click
@@ -27,3 +28,7 @@ def find_project_phid_by_title(
             ctx.fail(f"Project {project} not found.")
         return project_data["phid"]
     return None
+
+
+def choices_from_enum(EnumCls: type[StrEnum]) -> click.Choice:
+    return click.Choice(EnumCls._member_names_, case_sensitive=False)

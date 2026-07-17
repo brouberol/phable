@@ -2,7 +2,11 @@ from typing import Optional
 
 import click
 
-from phable.cli.utils import find_project_phid_by_title, project_phid_option
+from phable.cli.utils import (
+    choices_from_enum,
+    find_project_phid_by_title,
+    project_phid_option,
+)
 from phable.config import config
 from phable.display import TaskFormat, display_tasks
 from phable.phabricator import PhabricatorClient
@@ -20,8 +24,8 @@ from phable.phabricator import PhabricatorClient
 )
 @click.option(
     "--format",
-    type=click.Choice(TaskFormat._member_names_, case_sensitive=False),
-    default="plain",
+    type=choices_from_enum(TaskFormat),
+    default=TaskFormat.plain,
     help="Output format",
 )
 @click.option(

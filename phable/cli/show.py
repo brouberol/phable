@@ -1,5 +1,6 @@
 import click
 
+from phable.cli.utils import choices_from_enum
 from phable.display import TaskFormat, display_task
 from phable.phabricator import PhabricatorClient
 from phable.task import TASK_ID, Task
@@ -8,8 +9,8 @@ from phable.task import TASK_ID, Task
 @click.command(name="show")
 @click.option(
     "--format",
-    type=click.Choice(TaskFormat._member_names_, case_sensitive=False),
-    default="plain",
+    type=choices_from_enum(TaskFormat),
+    default=TaskFormat.plain,
     help="Output format",
 )
 @click.option("--full", "show_full", is_flag=True, help="Also show task comments")

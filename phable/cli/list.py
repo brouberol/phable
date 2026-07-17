@@ -2,7 +2,11 @@ from typing import Optional
 
 import click
 
-from phable.cli.utils import find_project_phid_by_title, project_phid_option
+from phable.cli.utils import (
+    choices_from_enum,
+    find_project_phid_by_title,
+    project_phid_option,
+)
 from phable.config import config
 from phable.display import TaskFormat, display_tasks
 from phable.phabricator import PhabricatorClient
@@ -34,7 +38,7 @@ from phable.task import TaskStatus
 @click.option(
     "--status",
     required=False,
-    type=click.Choice(TaskStatus._member_names_, case_sensitive=False),
+    type=choices_from_enum(TaskStatus),
     help="Task(s) status to filter on. Can be passed multiple times.",
     default=[TaskStatus.open, TaskStatus.progress, TaskStatus.stalled],
     multiple=True,
@@ -42,7 +46,7 @@ from phable.task import TaskStatus
 @click.option(
     "--format",
     required=False,
-    type=click.Choice(TaskFormat._member_names_, case_sensitive=False),
+    type=choices_from_enum(TaskFormat),
     default=TaskFormat.oneline,
     help="The output format of the task list",
 )
