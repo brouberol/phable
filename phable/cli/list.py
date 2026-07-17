@@ -43,7 +43,7 @@ from phable.task import TaskStatus
     "--format",
     required=False,
     type=click.Choice(TaskFormat._member_names_, case_sensitive=False),
-    default="plain",
+    default=TaskFormat.oneline,
     help="The output format of the task list",
 )
 @click.pass_context
@@ -56,7 +56,7 @@ def list_tasks(
     owner: Optional[str] = None,
     milestone: bool = False,
     status: tuple[str] | None = None,
-    format: TaskFormat = TaskFormat.plain,
+    format: TaskFormat = TaskFormat.oneline,
 ):
     """Lists and filter tasks
 
