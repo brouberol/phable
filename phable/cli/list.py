@@ -75,6 +75,18 @@ def list_tasks(
     $ phable list --milestone --owner self --column Done
 
     """
+    if not any((columns, owner, milestone)):
+        click.echo(
+            click.style(
+                "None of the --columns, --owner or --milestone flags were passed. "
+                "The task search will be extremely wide, as it will return all open tasks. ",
+                fg="yellow",
+            ),
+            err=True,
+        )
+        if not click.confirm("Continue?"):
+            ctx.exit()
+
     if owner:
         owner_user = None
         if owner == "self":
