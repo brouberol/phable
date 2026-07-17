@@ -23,7 +23,7 @@ from phable.config import config
 from phable.phabricator import PhabricatorClient
 
 
-@click.group(cls=AliasedCommandGroup)
+@click.group(cls=AliasedCommandGroup, context_settings={"show_default": True})
 @click.version_option(package_name="phable-cli")
 @click.pass_context
 def cli(ctx: Context):
