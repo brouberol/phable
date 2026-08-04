@@ -24,6 +24,7 @@ class DummyPhabricatorClient:
         backup_owner_phid=None,
         project_phid=None,
         status=None,
+        updated_since=None,
     ):
         self.find_tasks_calls.append(
             {

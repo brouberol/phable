@@ -1,11 +1,11 @@
 from typing import Optional
-
+from datetime import datetime, UTC, timedelta
 import click
-
 from phable.cli.utils import (
     choices_from_enum,
     find_project_phid_by_title,
     project_phid_option,
+    UPDATED_SINCE,
 )
 from phable.config import config
 from phable.display import TaskFormat, display_tasks
@@ -50,6 +50,13 @@ from phable.task import TaskStatus
     default=TaskFormat.oneline,
     help="The output format of the task list",
 )
+@click.option(
+    "--updated-since",
+    "updated_since_days",
+    required=False,
+    type=UPDATED_SINCE,
+    help="Only return tasks edited since the provided duration",
+)
 @click.pass_context
 @click.pass_obj
 def list_tasks(
@@ -61,6 +68,7 @@ def list_tasks(
     milestone: bool = False,
     status: tuple[str] | None = None,
     format: TaskFormat = TaskFormat.oneline,
+    updated_since_days: int | None = None,
 ):
     """Lists and filter tasks
 
@@ -77,6 +85,10 @@ def list_tasks(
     \b
     # List all tasks owner by the current user in the Done column of the default board latest milestone
     $ phable list --milestone --owner self --column Done
+    \b
+    # List all tasks owner by the current user in the Done column of the default board latest milestone
+    # updated in the last week
+    $ phable list --milestone --owner self --column Done --updated-since 1w
 
     """
     if not any((columns, owner, milestone)):
@@ -114,11 +126,18 @@ def list_tasks(
         ]
     else:
         column_phids = []
+
+    updated_since = None
+    if updated_since_days:
+        updated_since = int(
+            (datetime.now(UTC) - timedelta(days=updated_since_days)).timestamp()
+        )
     tasks = client.find_tasks(
         column_phids=column_phids,
         owner_phid=owner_user,
         project_phid=project_phid,
         status=list(status) if status else None,
+        updated_since=updated_since,
     )
     if owner_user:
         tasks += client.find_tasks(
@@ -126,6 +145,7 @@ def list_tasks(
             backup_owner_phid=owner_user,
             project_phid=project_phid,
             status=list(status) if status else None,
+            updated_since=updated_since,
         )
     tasks = [client.enrich_task(task) for task in tasks]
     display_tasks(tasks=tasks, format=format)

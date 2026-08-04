@@ -204,6 +204,7 @@ class PhabricatorClient:
         backup_owner_phid: Optional[str] = None,
         project_phid: Optional[str] = None,
         status: Optional[list[str]] = None,
+        updated_since: Optional[int] = None,
     ) -> list[dict[str, Any]]:
         params = {
             "attachments[subscribers]": "true",
@@ -221,6 +222,8 @@ class PhabricatorClient:
             params["constraints[custom.train.backup][0]"] = backup_owner_phid
         if project_phid:
             params["constraints[projects][0]"] = project_phid
+        if updated_since:
+            params["constraints[modifiedStart]"] = str(updated_since)
         return self._make_request("maniphest.search", params=params)["result"]["data"]
 
     def find_subtasks(self, parent_id: int) -> list[dict[str, Any]]:

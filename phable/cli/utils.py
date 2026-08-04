@@ -1,3 +1,4 @@
+import re
 from enum import StrEnum
 from typing import Optional
 
@@ -32,3 +33,21 @@ def find_project_phid_by_title(
 
 def choices_from_enum(EnumCls: type[StrEnum]) -> click.Choice:
     return click.Choice(EnumCls._member_names_, case_sensitive=False)
+
+
+class UpdatedSinceParamType(click.ParamType):
+    name = "updated_since"
+    pattern = re.compile(r"(\d+)[dw]")
+
+    def convert(self, value, param, ctx):
+        if match := re.match(self.pattern, value):
+            if match.group().endswith("w"):
+                return int(match.group(1)) * 7
+            else:
+                return int(match.group(1))
+        raise ValueError(
+            f"Invalid value: {value}. It must match the pattern {self.pattern}"
+        )
+
+
+UPDATED_SINCE = UpdatedSinceParamType()
