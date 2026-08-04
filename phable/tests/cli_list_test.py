@@ -49,17 +49,43 @@ def test_list_tasks_passes_statuses_and_queries_once_without_owner(monkeypatch):
         ["--status", "open", "--status", "duplicate"],
         obj=client,
     )
+    assert result.exit_code == 1
+    assert result.output.strip() == (
+        "None of the --columns, --owner or --milestone flags were passed. "
+        "The task search will be extremely wide, as it will return all open tasks. \n"
+        "Continue? [y/N]:Aborted!"
+    )
 
+
+def test_list_tasks_passes_statuses_and_queries_once_with_owner(monkeypatch):
+    monkeypatch.setattr(config, "phabricator_default_project_phid", "PHID-PROJ-123")
+    client = DummyPhabricatorClient()
+
+    result = CliRunner().invoke(
+        list_tasks,
+        ["--status", "open", "--status", "duplicate", "--owner", "self"],
+        obj=client,
+    )
     assert result.exit_code == 0
     assert client.target_project_phid == "PHID-PROJ-123"
     assert client.find_tasks_calls == [
         {
             "column_phids": [],
-            "owner_phid": None,
+            "owner_phid": "PHID-USER-123",
             "backup_owner_phid": None,
             "project_phid": "PHID-PROJ-123",
             "status": ["open", "duplicate"],
-        }
+        },
+        {
+            "backup_owner_phid": "PHID-USER-123",
+            "column_phids": [],
+            "owner_phid": None,
+            "project_phid": "PHID-PROJ-123",
+            "status": [
+                "open",
+                "duplicate",
+            ],
+        },
     ]
 
 
