@@ -29,7 +29,7 @@ from phable.utils import text_from_cli_arg_or_fs_or_editor
 )
 @click.option(
     "--priority",
-    type=click.Choice(["unbreaknow", "high", "normal", "low", "needs-triage"]),
+    type=click.Choice(["unbreak", "high", "normal", "low", "needs-triage"]),
     help="Priority level of the task",
     default="normal",
 )
