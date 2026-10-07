@@ -1,5 +1,6 @@
 import json
 from collections.abc import Callable
+from datetime import datetime
 from enum import StrEnum
 
 from .task import Task
@@ -48,10 +49,10 @@ class TaskPrinter:
 
 class JsonTaskPrinter(TaskPrinter):
     def print(self, task: dict) -> None:
-        self._printer(json.dumps(task, indent=2))
+        self._printer(json.dumps(task, indent=2, default=datetime.isoformat))
 
     def print_list(self, tasks: list[dict]) -> None:
-        self._printer(json.dumps(tasks, indent=2))
+        self._printer(json.dumps(tasks, indent=2, default=datetime.isoformat))
 
 
 class MarkdownTaskPrinter(TaskPrinter):
