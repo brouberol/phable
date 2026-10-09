@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 import pytest
+import responses
 
 from phable.cache import cache
 from phable.phabricator import PhabricatorClient
@@ -9,6 +10,12 @@ from phable.phabricator import PhabricatorClient
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 BASE_URL = "http://example.net/"
 TOKEN = "test_token"
+
+
+def add_response(endpoint: str, fixture: str):
+    responses.add(
+        responses.POST, BASE_URL + "api/" + endpoint, json=load_fixture(fixture)
+    )
 
 
 def load_fixture(name: str) -> dict:
