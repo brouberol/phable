@@ -31,8 +31,9 @@ from phable.task import TaskStatus
     "--milestone/--no-milestone",
     default=False,
     help=(
-        "If --milestone is passed, the task will be moved onto the current project's associated "
-        "milestone board, instead of the project board itself"
+        "If --milestone is passed, list tasks in the current milestone board, "
+        "otherwise list tasks in the main board. Sub-projects are always "
+        "excluded."
     ),
 )
 @click.option(

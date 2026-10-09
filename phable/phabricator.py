@@ -221,10 +221,27 @@ class PhabricatorClient:
         elif backup_owner_phid:
             params["constraints[custom.train.backup][0]"] = backup_owner_phid
         if project_phid:
+            # The projects constraint also matches the tasks in subprojects
+            # and milestones. Exclude each descendant project with not().
             params["constraints[projects][0]"] = project_phid
+            for i, descendant_phid in enumerate(
+                self.find_descendant_project_phids(project_phid), start=1
+            ):
+                params[f"constraints[projects][{i}]"] = f"not({descendant_phid})"
         if updated_since:
             params["constraints[modifiedStart]"] = str(updated_since)
         return self._make_request("maniphest.search", params=params)["result"]["data"]
+
+    def find_descendant_project_phids(self, project_phid: str) -> list[str]:
+        """Return the PHIDs of all subprojects and milestones of the given project"""
+        phids = []
+        params = {"constraints[ancestors][0]": project_phid}
+        while True:
+            result = self._make_request("project.search", params=params)["result"]
+            phids += [project["phid"] for project in result["data"]]
+            if not (after := result["cursor"]["after"]):
+                return phids
+            params["after"] = after
 
     def find_subtasks(self, parent_id: int) -> list[dict[str, Any]]:
         """Return details of all Maniphest subtasks of the provided task id"""
