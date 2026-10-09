@@ -39,6 +39,13 @@ def test_find_tasks_with_statuses(simple_task_response):
         callback=callback,
         content_type="application/json",
     )
+    responses.add(
+        responses.Response(
+            method="POST",
+            url=base_url + "api/project.search",
+            json=project_search_response([]),
+        )
+    )
 
     client = PhabricatorClient(base_url, token)
 
@@ -57,6 +64,58 @@ def test_find_tasks_with_statuses(simple_task_response):
     assert payload["constraints[projects][0]"] == ["PHID-PROJ-123"]
     assert payload["constraints[statuses][0]"] == ["open"]
     assert payload["constraints[statuses][1]"] == ["duplicate"]
+
+
+def project_search_response(phids: list[str], after: str | None = None) -> dict:
+    return {
+        "result": {
+            "data": [{"phid": phid} for phid in phids],
+            "cursor": {"after": after},
+        },
+        "error_code": None,
+        "error_info": None,
+    }
+
+
+@responses.activate
+def test_find_tasks_excludes_descendant_projects(simple_task_response):
+    project_search_bodies = []
+
+    def project_search_callback(request):
+        payload = parse_qs(request.body)
+        project_search_bodies.append(payload)
+        if "after" not in payload:
+            body = project_search_response(["PHID-PROJ-sub"], after="100")
+        else:
+            body = project_search_response(["PHID-PROJ-milestone"])
+        return (200, {}, json.dumps(body))
+
+    responses.add_callback(
+        responses.POST,
+        base_url + "api/project.search",
+        callback=project_search_callback,
+        content_type="application/json",
+    )
+    responses.add(
+        responses.Response(
+            method="POST",
+            url=base_url + "api/maniphest.search",
+            json=simple_task_response,
+        )
+    )
+
+    client = PhabricatorClient(base_url, token)
+    client.find_tasks(project_phid="PHID-PROJ-123")
+
+    assert [body["constraints[ancestors][0]"] for body in project_search_bodies] == [
+        ["PHID-PROJ-123"],
+        ["PHID-PROJ-123"],
+    ]
+    assert project_search_bodies[1]["after"] == ["100"]
+    payload = parse_qs(responses.calls[-1].request.body)
+    assert payload["constraints[projects][0]"] == ["PHID-PROJ-123"]
+    assert payload["constraints[projects][1]"] == ["not(PHID-PROJ-sub)"]
+    assert payload["constraints[projects][2]"] == ["not(PHID-PROJ-milestone)"]
 
 
 @responses.activate
