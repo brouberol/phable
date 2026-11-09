@@ -37,6 +37,9 @@ def move_task(
 ) -> None:
     """Move one or several task on their current project board
 
+    If the task is not yet tagged with the target project (or milestone),
+    the tag is added before the move.
+
     If the task is moved to a 'Done' column, it will be automatically
     marked as 'Resolved' as well.
 
@@ -56,6 +59,9 @@ def move_task(
         target_column_phid = client.find_column_in_project(target_project_phid, column)
 
         for task_id in task_ids:
+            # Make sure the task is tagged with target_project (for example when moving a task from backlog to milestone)
+            client.assign_tag_to_task(task_id=task_id, tag_phid=target_project_phid)
+
             client.move_task_to_column(task_id=task_id, column_phid=target_column_phid)
             if column.lower() in ("in progress", "needs review"):
                 client.mark_task_as_in_progress(task_id)
